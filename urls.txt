@@ -1,0 +1,2 @@
+inicio|https://sedeelectronica.sic.gov.co/ 
+transparencia|https://sedeelectronica.sic.gov.co/transparencia
