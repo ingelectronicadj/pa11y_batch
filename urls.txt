@@ -1,2 +1,3 @@
-inicio|https://sedeelectronica.sic.gov.co/ 
-transparencia|https://sedeelectronica.sic.gov.co/transparencia
+inicio|https://www.hiberus.com
+sobre-nosotros|https://www.hiberus.com/sobre-nosotros
+soluciones|https://www.hiberus.com/soluciones-tecnologicas-por-mercados

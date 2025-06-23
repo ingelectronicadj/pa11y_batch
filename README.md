@@ -25,23 +25,26 @@ Puedes ejecutarlo con argumentos o de forma interactiva:
 ### Opción 1: con argumentos
 
 ```bash
-./pa11y_batch.sh <formato> <nivel> <espera_ms> <archivo_urls>
+./pa11y_batch.sh <formato> <nivel> <espera_ms> <archivo_urls> [selector_raiz] [selectores_ocultos]
+
 ``` 
 
 - `<formato>`: Tipo de reporte (`html`, `json`, `csv`, `tsv`, `cli`)
 - `<nivel>`: Nivel de severidad (`errors`, `warnings`, `notices`)
 - `<espera_ms>`: Tiempo de espera en milisegundos antes de iniciar el análisis (para garantizar la carga completa de la página)
 - `<archivo_urls>`: Ruta al archivo `.txt` con URLs
+- `[selector_raiz]`: (opcional) Selector CSS para limitar el análisis (ej: #main, .contenido)
+- `[selectores_ocultos]`: (opcional) Selectores CSS a ocultar (separados por coma, ej: .banner,.popup)
 
 **Ejemplo:**
 
 ```bash
-./pa11y_batch.sh html errors 5000 urls.txt
+./pa11y_batch.sh html warnings 4000 urls.txt "#main" ".cookie-banner,.ads"
 ``` 
 
 ### Opción 2: interactiva (sin argumentos)
 
-El script te pedirá los datos paso a paso: formato, nivel, espera y archivo de URLs.
+El script te pedirá los datos paso a paso: formato, nivel de severidad, tiempo de espera, ruta del archivo de URLs, (opcional) un selector raíz para limitar el análisis a un elemento específico del DOM, (opcional) selectores separados por comas para ocultar elementos durante el análisis.
 
 ```bash
 ./pa11y_batch.sh
@@ -52,7 +55,7 @@ El script te pedirá los datos paso a paso: formato, nivel, espera y archivo de 
 Los reportes individuales se guardan automáticamente en la carpeta `./artifacts`, cada uno con nombre único. 
 ```bash
 artifacts/inicio-report-1750552763.html
-artifacts/transparencia-report-1750552763.json
+artifacts/sobre-nosotros-report-1750552763.json
 ...
 ``` 
 El nombre incluye el alias definido en la lista y un timestamp para identificar el lote de ejecución.
@@ -65,4 +68,11 @@ El nombre incluye el alias definido en la lista y un timestamp para identificar 
 - Ejecuta con un tiempo de espera configurable para garantizar que la página cargue completamente antes de la evaluación.
 - Genera reportes individuales en formatos compatibles: `html`, `json`, `csv`, `tsv` o salida por consola (`cli`).
 - Los archivos se guardan automáticamente en la carpeta `./artifacts` con nombres únicos que incluyen alias y timestamp.
+- Uso de --root-element para enfocar el análisis en una sección específica.
+- Uso de --hide-elements para omitir secciones visuales molestas (modales, banners, etc.).
 - Informa en consola si la generación del reporte fue exitosa o fallida por cada URL evaluada.
+
+## Licencia
+
+Este proyecto está licenciado bajo los términos de la **GNU GPL v3**. Si usas este script (total o parcialmente) en otros proyectos, por favor brinda atribución al autor original: **Diego Javier Mena Amado**  
+Puedes hacerlo mediante una mención en el README, comentarios en el código, o en la documentación del sistema que lo utilice.
