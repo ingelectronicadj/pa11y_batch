@@ -1,0 +1,983 @@
+{
+  "lang": "es",
+  "engine": "HTML_CodeSniffer",
+  "version": "2.5.1",
+  "rules": {
+    "auditor_name": {
+      "en": "HTML_CodeSniffer by Squiz",
+      "es": "HTML_CodeSniffer por Squiz"
+    },
+    "auditor_using_standard": {
+      "en": "Using standard",
+      "es": "Usando el estándar"
+    },
+    "auditor_standards": {
+      "en": "Standards",
+      "es": "Estándares"
+    },
+    "auditor_code_snippet": {
+      "en": "Code Snippet",
+      "es": "Fragmento de código"
+    },
+    "auditor_close": {
+      "en": "Close",
+      "es": "Cerrar"
+    },
+    "auditor_select_types": {
+      "en": "Select the types of issues to include in the report",
+      "es": "Seleccione los tipos de incidencias a incluir en el reporte"
+    },
+    "auditor_home": {
+      "en": "Home",
+      "es": "Inicio"
+    },
+    "auditor_view_report": {
+      "en": "View Report",
+      "es": "Ver reporte"
+    },
+    "auditor_report": {
+      "en": "Report",
+      "es": "Reporte"
+    },
+    "auditor_back_to_report": {
+      "en": "Back to Report",
+      "es": "Volver al reporte"
+    },
+    "auditor_previous_issue": {
+      "en": "Previous Issue",
+      "es": "Incidencia anterior"
+    },
+    "auditor_next_issue": {
+      "en": "Next Issue",
+      "es": "Siguiente incidencia"
+    },
+    "auditor_issue": {
+      "en": "Issue",
+      "es": "Incidencia"
+    },
+    "auditor_of": {
+      "en": "of",
+      "es": "de"
+    },
+    "auditor_errors": {
+      "en": "Errors",
+      "es": "Errores"
+    },
+    "auditor_error": {
+      "en": "Error",
+      "es": "Error"
+    },
+    "auditor_warnings": {
+      "en": "Warnings",
+      "es": "Advertencias"
+    },
+    "auditor_warning": {
+      "en": "Warning",
+      "es": "Advertencia"
+    },
+    "auditor_notices": {
+      "en": "Notices",
+      "es": "Avisos"
+    },
+    "auditor_notice": {
+      "en": "Notice",
+      "es": "Aviso"
+    },
+    "auditor_toggle_display_of": {
+      "en": "Toggle display of",
+      "es": "Alternar visualización de"
+    },
+    "auditor_messages": {
+      "en": "messages",
+      "es": "mensajes"
+    },
+    "auditor_unable_to_point": {
+      "en": "Unable to point to the element associated with this issue.",
+      "es": "No es posible señalar el elemento asociado con esta incidencia."
+    },
+    "auditor_unable_to_point_entire": {
+      "en": "Unable to point to this issue, as it relates to the entire document.",
+      "es": "No es posible señalar esta incidencia porque aplica a todo el documento."
+    },
+    "auditor_unable_to_point_removed": {
+      "en": "Unable to point to this element as it has been removed from the document since the report was generated.",
+      "es": "No es posible señalar este elemento porque fue eliminado del documento desde que se generó el reporte."
+    },
+    "auditor_unable_to_point_outside": {
+      "en": "Unable to point to this element because it is located outside the document's body element.",
+      "es": "No es posible señalar este elemento porque está ubicado fuera del elemento body del documento."
+    },
+    "auditor_unable_to_point_hidden": {
+      "en": "Unable to point to this element because it is hidden from view, or does not have a visual representation.",
+      "es": "No es posible señalar este elemento porque está oculto o no tiene representación visual."
+    },
+    "auditor_point_to_element": {
+      "en": "Point to Element",
+      "es": "Señalar elemento"
+    },
+    "auditor_unsupported_browser": {
+      "en": "The code snippet functionality is not supported in this browser.",
+      "es": "La funcionalidad de fragmento de código no está soportada en este navegador."
+    },
+    "auditor_page": {
+      "en": "Page",
+      "es": "Página"
+    },
+    "auditor_updated_to": {
+      "en": "HTML_CodeSniffer has been updated to version",
+      "es": "HTML_CodeSniffer se ha actualizado a la versión"
+    },
+    "auditor_view_the_changelog": {
+      "en": "View the changelog",
+      "es": "Ver el historial de cambios"
+    },
+    "auditor_success_criterion": {
+      "en": "Success Criterion",
+      "es": "Criterio de Conformidad"
+    },
+    "auditor_suggested_techniques": {
+      "en": "Suggested Techniques",
+      "es": "Técnicas sugeridas"
+    },
+    "auditor_applies_entire_document": {
+      "en": "This applies to the entire document",
+      "es": "Esto aplica a todo el documento"
+    },
+    "1_1_1_H30.2": {
+      "en": "Img element is the only content of the link, but is missing alt text. The alt text should describe the purpose of the link.",
+      "es": "El elemento img es el único contenido del enlace, pero no tiene texto alternativo (alt). El texto alternativo debe describir el propósito del enlace."
+    },
+    "1_1_1_H67.1": {
+      "en": "Img element with empty alt text must have absent or empty title attribute.",
+      "es": "Un elemento img con texto alternativo (alt) vacío debe carecer de atributo title o tenerlo vacío."
+    },
+    "1_1_1_H67.2": {
+      "en": "Img element is marked so that it is ignored by Assistive Technology.",
+      "es": "El elemento img está marcado para ser ignorado por las tecnologías de apoyo."
+    },
+    "1_1_1_H37": {
+      "en": "Img element missing an alt attribute. Use the alt attribute to specify a short text alternative.",
+      "es": "El elemento img no tiene atributo alt. Utilice el atributo alt para especificar una alternativa textual breve."
+    },
+    "1_1_1_G94.Image": {
+      "en": "Ensure that the img element's alt text serves the same purpose and presents the same information as the image.",
+      "es": "Asegúrese de que el texto alternativo (alt) del elemento img cumpla el mismo propósito y presente la misma información que la imagen."
+    },
+    "1_1_1_H36": {
+      "en": "Image submit button missing an alt attribute. Specify a text alternative that describes the button's function, using the alt attribute.",
+      "es": "El botón de envío con imagen (input type=\"image\") no tiene atributo alt. Especifique una alternativa textual que describa la función del botón mediante el atributo alt."
+    },
+    "1_1_1_G94.Button": {
+      "en": "Ensure that the image submit button's alt text identifies the purpose of the button.",
+      "es": "Asegúrese de que el texto alternativo (alt) del botón de imagen identifique el propósito del botón."
+    },
+    "1_1_1_H24": {
+      "en": "Area element in an image map missing an alt attribute. Each area element must have a text alternative that describes the function of the image map area.",
+      "es": "El elemento area en un mapa de imagen no tiene atributo alt. Cada elemento area debe tener una alternativa textual que describa la función del área del mapa de imagen."
+    },
+    "1_1_1_H24.2": {
+      "en": "Ensure that the area element's text alternative serves the same purpose as the part of image map image it references.",
+      "es": "Asegúrese de que la alternativa textual del elemento area cumpla el mismo propósito que la parte de la imagen del mapa a la que hace referencia."
+    },
+    "1_1_1_G73,G74": {
+      "en": "If this image cannot be fully described in a short text alternative, ensure a long text alternative is also available, such as in the body text or through a link.",
+      "es": "Si esta imagen no puede describirse por completo en un texto alternativo breve, asegúrese de que también haya disponible una descripción extensa, ya sea en el texto adyacente o mediante un enlace."
+    },
+    "1_1_1_H2.EG5": {
+      "en": "Img element inside a link must not use alt text that duplicates the text content of the link.",
+      "es": "Un elemento img dentro de un enlace no debe usar un texto alt que duplique el contenido de texto del propio enlace."
+    },
+    "1_1_1_H2.EG4": {
+      "en": "Img element inside a link has empty or missing alt text when a link beside it contains link text. Consider combining the links.",
+      "es": "Un elemento img dentro de un enlace tiene el atributo alt vacío o ausente junto a un enlace adyacente que contiene texto. Considere combinar ambos enlaces en uno solo."
+    },
+    "1_1_1_H2.EG3": {
+      "en": "Img element inside a link must not use alt text that duplicates the content of a text link beside it.",
+      "es": "Un elemento img dentro de un enlace no debe usar un texto alt que duplique el contenido de un enlace de texto adyacente."
+    },
+    "1_1_1_H53,ARIA6": {
+      "en": "Object elements must contain a text alternative after all other alternatives are exhausted.",
+      "es": "Los elementos object deben contener una alternativa textual tras agotar las demás alternativas."
+    },
+    "1_1_1_G94,G92.Object,ARIA6": {
+      "en": "Check that short (and if appropriate, long) text alternatives are available for non-text content that serve the same purpose and present the same information.",
+      "es": "Verifique que existan alternativas textuales breves (y, de ser apropiado, extensas) para el contenido no textual que cumplan el mismo propósito y presenten la misma información."
+    },
+    "1_1_1_H35.3": {
+      "en": "Applet elements must contain a text alternative in the element's body, for browsers without support for the applet element.",
+      "es": "Los elementos applet deben contener una alternativa textual en el cuerpo del elemento para navegadores sin soporte para applet."
+    },
+    "1_1_1_H35.2": {
+      "en": "Applet elements must contain an alt attribute, to provide a text alternative to browsers supporting the element but are unable to load the applet.",
+      "es": "Los elementos applet deben contener un atributo alt para proporcionar una alternativa textual a los navegadores que soportan el elemento pero no pueden cargar el applet."
+    },
+    "1_1_1_G94,G92.Applet": {
+      "en": "Check that short (and if appropriate, long) text alternatives are available for non-text content that serve the same purpose and present the same information.",
+      "es": "Verifique que existan alternativas textuales breves (y, de ser apropiado, extensas) para el contenido no textual que cumplan el mismo propósito y presenten la misma información."
+    },
+    "1_2_1_G158": {
+      "en": "If this embedded object contains pre-recorded audio only, and is not provided as an alternative for text content, check that an alternative text version is available.",
+      "es": "Si este objeto embebido contiene únicamente audio pregrabado y no se ofrece como alternativa a un contenido textual, verifique que exista una versión de texto alternativa disponible."
+    },
+    "1_2_1_G159,G166": {
+      "en": "If this embedded object contains pre-recorded video only, and is not provided as an alternative for text content, check that an alternative text version is available, or an audio track is provided that presents equivalent information.",
+      "es": "Si este objeto embebido contiene únicamente vídeo pregrabado y no se ofrece como alternativa a un contenido textual, verifique que exista una versión de texto alternativa o una pista de audio con información equivalente."
+    },
+    "1_2_2_G87,G93": {
+      "en": "If this embedded object contains pre-recorded synchronised media and is not provided as an alternative for text content, check that captions are provided for audio content.",
+      "es": "Si este objeto embebido contiene multimedia sincronizada pregrabada y no se ofrece como alternativa a un contenido textual, verifique que se proporcionen subtítulos para el contenido de audio."
+    },
+    "1_2_3_G69,G78,G173,G8": {
+      "en": "If this embedded object contains pre-recorded synchronised media and is not provided as an alternative for text content, check that an audio description of its video, and/or an alternative text version of the content is provided.",
+      "es": "Si este objeto embebido contiene multimedia sincronizada pregrabada y no se ofrece como alternativa a un contenido textual, verifique que se proporcione una audiodescripción del vídeo y/o una versión de texto alternativa."
+    },
+    "1_2_4_G9,G87,G93": {
+      "en": "If this embedded object contains synchronised media, check that captions are provided for live audio content.",
+      "es": "Si este objeto embebido contiene multimedia sincronizada, verifique que se proporcionen subtítulos para el contenido de audio en directo."
+    },
+    "1_2_5_G78,G173,G8": {
+      "en": "If this embedded object contains pre-recorded synchronised media, check that an audio description is provided for its video content.",
+      "es": "Si este objeto embebido contiene multimedia sincronizada pregrabada, verifique que se proporcione una audiodescripción para su contenido de vídeo."
+    },
+    "1_2_6_G54,G81": {
+      "en": "If this embedded object contains pre-recorded synchronised media, check that a sign language interpretation is provided for its audio.",
+      "es": "Si este objeto embebido contiene multimedia sincronizada pregrabada, verifique que se proporcione interpretación en lengua de señas para su contenido de audio."
+    },
+    "1_2_7_G8": {
+      "en": "If this embedded object contains synchronised media, and where pauses in foreground audio is not sufficient to allow audio descriptions to convey the sense of pre-recorded video, check that an extended audio description is provided, either through scripting or an alternate version.",
+      "es": "Si este objeto embebido contiene multimedia sincronizada y las pausas en el audio principal no son suficientes para que la audiodescripción transmita el sentido del vídeo pregrabado, verifique que se proporcione una audiodescripción ampliada."
+    },
+    "1_2_8_G69,G159": {
+      "en": "If this embedded object contains pre-recorded synchronised media or video-only content, check that an alternative text version of the content is provided.",
+      "es": "Si este objeto embebido contiene multimedia sincronizada pregrabada o contenido de solo vídeo, verifique que se proporcione una versión de texto alternativa del contenido."
+    },
+    "1_2_9_G150,G151,G157": {
+      "en": "If this embedded object contains live audio-only content, check that an alternative text version of the content is provided.",
+      "es": "Si este objeto embebido contiene únicamente audio en directo, verifique que se proporcione una versión de texto alternativa del contenido."
+    },
+    "1_3_1_F92,ARIA4": {
+      "en": "This element's role is \"presentation\" but contains child elements with semantic meaning.",
+      "es": "El rol de este elemento es \"presentation\", pero contiene elementos hijos con significado semántico."
+    },
+    "1_3_1_H44.NonExistent": {
+      "en": "This label's \"for\" attribute contains an ID that does not exist in the document.",
+      "es": "El atributo \"for\" de este elemento label contiene un ID que no existe en el documento."
+    },
+    "1_3_1_H44.NonExistentFragment": {
+      "en": "This label's \"for\" attribute contains an ID that does not exist in the document fragment.",
+      "es": "El atributo \"for\" de este elemento label contiene un ID que no existe en el fragmento del documento."
+    },
+    "1_3_1_H44.NotFormControl": {
+      "en": "This label's \"for\" attribute contains an ID for an element that is not a form control. Ensure that you have entered the correct ID for the intended element.",
+      "es": "El atributo \"for\" de este elemento label apunta al ID de un elemento que no es un control de formulario. Asegúrese de haber ingresado el ID correcto del elemento deseado."
+    },
+    "1_3_1_H65": {
+      "en": "This form control has a \"title\" attribute that is empty or contains only spaces. It will be ignored for labelling test purposes.",
+      "es": "Este control de formulario tiene un atributo \"title\" vacío o que solo contiene espacios. Será ignorado para efectos de etiquetado accesible."
+    },
+    "1_3_1_ARIA6": {
+      "en": "This form control has an \"aria-label\" attribute that is empty or contains only spaces. It will be ignored for labelling test purposes.",
+      "es": "Este control de formulario tiene un atributo \"aria-label\" vacío o que solo contiene espacios. Será ignorado para efectos de etiquetado accesible."
+    },
+    "1_3_1_ARIA16,ARIA9": {
+      "en": "This form control contains an aria-labelledby attribute, however it includes an ID \"{{id}}\" that does not exist on an element. The aria-labelledby attribute will be ignored for labelling test purposes.",
+      "es": "Este control de formulario contiene un atributo aria-labelledby, pero incluye un ID \"{{id}}\" que no existe en ningún elemento. El atributo aria-labelledby será ignorado."
+    },
+    "1_3_1_F68.Hidden": {
+      "en": "This hidden form field is labelled in some way. There should be no need to label a hidden form field.",
+      "es": "Este campo de formulario oculto está etiquetado de alguna manera. No debería ser necesario etiquetar un campo de formulario oculto."
+    },
+    "1_3_1_F68.HiddenAttr": {
+      "en": "This form field is intended to be hidden (using the \"hidden\" attribute), but is also labelled in some way. There should be no need to label a hidden form field.",
+      "es": "Este campo de formulario está marcado como oculto (usando el atributo \"hidden\"), pero también está etiquetado. No debería ser necesario etiquetar un campo oculto."
+    },
+    "1_3_1_F68": {
+      "en": "This form field should be labelled in some way. Use the label element (either with a \"for\" attribute or wrapped around the form field), or \"title\", \"aria-label\" or \"aria-labelledby\" attributes as appropriate.",
+      "es": "Este campo de formulario debe estar etiquetado de alguna manera. Utilice el elemento label (ya sea con un atributo \"for\" o envolviendo el campo), o los atributos \"title\", \"aria-label\" o \"aria-labelledby\" según corresponda."
+    },
+    "1_3_1_H49.": {
+      "en": "Presentational markup used that has become obsolete in HTML5.",
+      "es": "Se ha utilizado marcado de presentación que ha quedado obsoleto en HTML5."
+    },
+    "1_3_1_H49.AlignAttr": {
+      "en": "Align attributes.",
+      "es": "Atributos de alineación (align)."
+    },
+    "1_3_1_H49.Semantic": {
+      "en": "Semantic markup should be used to mark emphasised or special text so that it can be programmatically determined.",
+      "es": "Debe utilizarse marcado semántico para destacar texto enfatizado o especial de modo que pueda determinarse por software."
+    },
+    "1_3_1_H49.AlignAttr.Semantic": {
+      "en": "Semantic markup should be used to mark emphasised or special text so that it can be programmatically determined.",
+      "es": "Debe utilizarse marcado semántico para destacar texto enfatizado o especial de modo que pueda determinarse por software."
+    },
+    "1_3_1_H42": {
+      "en": "Heading markup should be used if this content is intended as a heading.",
+      "es": "Debe utilizarse marcado de encabezado (h1-h6) si este contenido pretende ser un encabezado."
+    },
+    "1_3_1_H63.3": {
+      "en": "Table cell has an invalid scope attribute. Valid values are row, col, rowgroup, or colgroup.",
+      "es": "La celda de la tabla tiene un atributo scope inválido. Los valores válidos son row, col, rowgroup o colgroup."
+    },
+    "1_3_1_H63.2": {
+      "en": "Scope attributes on td elements that act as headings for other elements are obsolete in HTML5. Use a th element instead.",
+      "es": "Los atributos scope en elementos td que actúan como encabezados de otros elementos están obsoletos en HTML5. Utilice un elemento th en su lugar."
+    },
+    "1_3_1_H43.ScopeAmbiguous": {
+      "en": "Scope attributes on th elements are ambiguous in a table with multiple levels of headings. Use the headers attribute on td elements instead.",
+      "es": "Los atributos scope en elementos th resultan ambiguos en una tabla con múltiples niveles de encabezados. Utilice el atributo headers en los elementos td en su lugar."
+    },
+    "1_3_1_H43.IncorrectAttr": {
+      "en": "Incorrect headers attribute on this td element. Expected \"{{expected}}\" but found \"{{actual}}\"",
+      "es": "Atributo headers incorrecto en este elemento td. Se esperaba \"{{expected}}\" pero se encontró \"{{actual}}\"."
+    },
+    "1_3_1_H43.HeadersRequired": {
+      "en": "The relationship between td elements and their associated th elements is not defined. As this table has multiple levels of th elements, you must use the headers attribute on td elements.",
+      "es": "La relación entre los elementos td y sus elementos th asociados no está definida. Como esta tabla tiene múltiples niveles de elementos th, debe utilizar el atributo headers en los elementos td."
+    },
+    "1_3_1_H43.MissingHeaderIds": {
+      "en": "Not all th elements in this table contain an id attribute. These cells should contain ids so that they may be referenced by td elements' headers attributes.",
+      "es": "No todos los elementos th de esta tabla contienen un atributo id. Estas celdas deben tener un id para que puedan ser referenciadas por los atributos headers de los elementos td."
+    },
+    "1_3_1_H43.MissingHeadersAttrs": {
+      "en": "Not all td elements in this table contain a headers attribute. Each headers attribute should list the ids of all th elements associated with that cell.",
+      "es": "No todos los elementos td de esta tabla contienen un atributo headers. Cada atributo headers debe listar los ids de todos los elementos th asociados con esa celda."
+    },
+    "1_3_1_H43,H63": {
+      "en": "The relationship between td elements and their associated th elements is not defined. Use either the scope attribute on th elements, or the headers attribute on td elements.",
+      "es": "La relación entre los elementos td y sus elementos th asociados no está definida. Utilice el atributo scope en los elementos th o el atributo headers en los elementos td."
+    },
+    "1_3_1_H63.1": {
+      "en": "Not all th elements in this table have a scope attribute. These cells should contain a scope attribute to identify their association with td elements.",
+      "es": "No todos los elementos th de esta tabla tienen un atributo scope. Estas celdas deben contener un atributo scope para identificar su asociación con los elementos td."
+    },
+    "1_3_1_H73.3.LayoutTable": {
+      "en": "This table appears to be used for layout, but contains a summary attribute. Layout tables must not contain summary attributes, or if supplied, must be empty.",
+      "es": "Esta tabla parece usarse para maquetación (layout), pero contiene un atributo summary. Las tablas de maquetación no deben contener atributos summary o, de incluirse, deben estar vacíos."
+    },
+    "1_3_1_H39,H73.4": {
+      "en": "If this table is a data table, and both a summary attribute and a caption element are present, the summary should not duplicate the caption.",
+      "es": "Si esta tabla es una tabla de datos y están presentes tanto un atributo summary como un elemento caption, el summary no debe duplicar el contenido del caption."
+    },
+    "1_3_1_H73.3.Check": {
+      "en": "If this table is a data table, check that the summary attribute describes the table's organization or explains how to use the table.",
+      "es": "Si esta tabla es una tabla de datos, verifique que el atributo summary describa la organización de la tabla o explique cómo utilizarla."
+    },
+    "1_3_1_H73.3.NoSummary": {
+      "en": "If this table is a data table, consider using the summary attribute of the table element to give an overview of this table.",
+      "es": "Si esta tabla es una tabla de datos, considere usar el atributo summary del elemento table para ofrecer una descripción general de la tabla."
+    },
+    "1_3_1_H39.3.LayoutTable": {
+      "en": "This table appears to be used for layout, but contains a caption element. Layout tables must not contain captions.",
+      "es": "Esta tabla parece usarse para maquetación (layout), pero contiene un elemento caption. Las tablas de maquetación no deben contener elementos caption."
+    },
+    "1_3_1_H39.3.Check": {
+      "en": "If this table is a data table, check that the caption element accurately describes this table.",
+      "es": "Si esta tabla es una tabla de datos, verifique que el elemento caption describa con precisión esta tabla."
+    },
+    "1_3_1_H39.3.NoCaption": {
+      "en": "If this table is a data table, consider using a caption element to the table element to identify this table.",
+      "es": "Si esta tabla es una tabla de datos, considere usar un elemento caption dentro de table para identificar esta tabla."
+    },
+    "1_3_1_H71.NoLegend": {
+      "en": "Fieldset does not contain a legend element. All fieldsets should contain a legend element that describes a description of the field group.",
+      "es": "El elemento fieldset no contiene un elemento legend. Todos los elementos fieldset deben contener un elemento legend que describa el grupo de campos."
+    },
+    "1_3_1_H85.2": {
+      "en": "If this selection list contains groups of related options, they should be grouped with optgroup.",
+      "es": "Si esta lista de selección (select) contiene grupos de opciones relacionadas, deben agruparse mediante optgroup."
+    },
+    "1_3_1_H71.SameName": {
+      "en": "If these radio buttons or check boxes require a further group-level description, they should be contained within a fieldset element.",
+      "es": "Si estos botones de opción (radio) o casillas de verificación (checkbox) requieren una descripción adicional a nivel de grupo, deben estar contenidos dentro de un elemento fieldset."
+    },
+    "1_3_1_H48.1": {
+      "en": "This content looks like it is simulating an unordered list using plain text. If so, marking up this content with a ul element would add proper structure information to the document.",
+      "es": "Este contenido parece simular una lista no ordenada usando texto plano. De ser así, marcar este contenido con un elemento ul añadiría información estructural adecuada al documento."
+    },
+    "1_3_1_H48.2": {
+      "en": "This content looks like it is simulating an ordered list using plain text. If so, marking up this content with an ol element would add proper structure information to the document.",
+      "es": "Este contenido parece simular una lista ordenada usando texto plano. De ser así, marcar este contenido con un elemento ol añadiría información estructural adecuada al documento."
+    },
+    "1_3_1_G141_a": {
+      "en": "The heading structure is not logically nested. This h{{headingNum}} element appears to be the primary document heading, so should be an h1 element.",
+      "es": "La estructura de encabezados no está anidada lógicamente. Este elemento h{{headingNum}} parece ser el encabezado principal del documento, por lo que debería ser un elemento h1."
+    },
+    "1_3_1_G141_b": {
+      "en": "The heading structure is not logically nested. This h{{headingNum}} element should be an h{{properHeadingNum}} to be properly nested.",
+      "es": "La estructura de encabezados no está anidada lógicamente. Este elemento h{{headingNum}} debería ser un h{{properHeadingNum}} para estar correctamente anidado."
+    },
+    "1_3_1_H42.2": {
+      "en": "Heading tag found with no content. Text that is not intended as a heading should not be marked up with heading tags.",
+      "es": "Se encontró una etiqueta de encabezado sin contenido. El texto que no tenga función de encabezado no debe marcarse con etiquetas de encabezado."
+    },
+    "1_3_1_H48": {
+      "en": "If this element contains a navigation section, it is recommended that it be marked up as a list.",
+      "es": "Si este elemento contiene una sección de navegación, se recomienda marcarlo como una lista (ul/ol)."
+    },
+    "1_3_1_LayoutTable": {
+      "en": "This table appears to be a layout table. If it is meant to instead be a data table, ensure header cells are identified using th elements.",
+      "es": "Esta tabla parece ser una tabla de maquetación. Si en realidad es una tabla de datos, asegúrese de identificar las celdas de encabezado mediante elementos th."
+    },
+    "1_3_1_DataTable": {
+      "en": "This table appears to be a data table. If it is meant to instead be a layout table, ensure there are no th elements, and no summary or caption.",
+      "es": "Esta tabla parece ser una tabla de datos. Si en realidad es una tabla de maquetación, asegúrese de que no contenga elementos th, ni summary o caption."
+    },
+    "1_3_2_G57": {
+      "en": "Check that the content is ordered in a meaningful sequence when linearised, such as when style sheets are disabled.",
+      "es": "Verifique que el contenido esté ordenado en una secuencia significativa cuando se linealiza, por ejemplo al desactivar las hojas de estilo."
+    },
+    "1_3_3_G96": {
+      "en": "Where instructions are provided for understanding the content, do not rely on sensory characteristics alone (such as shape, size or location) to describe objects.",
+      "es": "Cuando se proporcionen instrucciones para comprender el contenido, no dependa exclusivamente de características sensoriales (como forma, tamaño o ubicación) para describir los objetos."
+    },
+    "1_3_4.RestrictView": {
+      "en": "Check that content does not restrict its view and operation to a single display orientation, such as portrait or landscape, unless a specific display orientation is essential.",
+      "es": "Verifique que el contenido no restrinja su visualización y operación a una única orientación de pantalla (como vertical u horizontal), a menos que una orientación específica sea esencial."
+    },
+    "1_3_5_H98.FaultyValue": {
+      "en": "This element contains a potentially faulty value in its autocomplete attribute: {{valuesStr}}.",
+      "es": "Este elemento contiene un valor potencialmente inválido en su atributo autocomplete: {{valuesStr}}."
+    },
+    "1_3_5_H98.InvalidAutocomplete_Text": {
+      "en": "Invalid autocomplete value: {{x}}. Element does not belong to Text control group.",
+      "es": "Valor de autocomplete inválido: {{x}}. El elemento no pertenece al grupo de controles de texto."
+    },
+    "1_3_5_H98.InvalidAutocomplete_Multiline": {
+      "en": "Invalid autocomplete value: {{x}}. Element does not belong to Multiline control group.",
+      "es": "Valor de autocomplete inválido: {{x}}. El elemento no pertenece al grupo de controles multilínea."
+    },
+    "1_3_5_H98.InvalidAutocomplete_Password": {
+      "en": "Invalid autocomplete value: {{x}}. Element does not belong to Password control group.",
+      "es": "Valor de autocomplete inválido: {{x}}. El elemento no pertenece al grupo de controles de contraseña."
+    },
+    "1_3_5_H98.InvalidAutocomplete_Url": {
+      "en": "Invalid autocomplete value: {{x}}. Element does not belong to Url control group.",
+      "es": "Valor de autocomplete inválido: {{x}}. El elemento no pertenece al grupo de controles de URL."
+    },
+    "1_3_5_H98.InvalidAutocomplete_Telephone": {
+      "en": "Invalid autocomplete value: {{x}}. Element does not belong to Telephone control group.",
+      "es": "Valor de autocomplete inválido: {{x}}. El elemento no pertenece al grupo de controles telefónicos."
+    },
+    "1_3_5_H98.InvalidAutocomplete_Numeric": {
+      "en": "Invalid autocomplete value: {{x}}. Element does not belong to Numeric control group.",
+      "es": "Valor de autocomplete inválido: {{x}}. El elemento no pertenece al grupo de controles numéricos."
+    },
+    "1_3_5_H98.InvalidAutocomplete_Month": {
+      "en": "Invalid autocomplete value: {{x}}. Element does not belong to Month control group.",
+      "es": "Valor de autocomplete inválido: {{x}}. El elemento no pertenece al grupo de controles de mes."
+    },
+    "1_3_5_H98.InvalidAutocomplete_Date": {
+      "en": "Invalid autocomplete value: {{x}}. Element does not belong to Date control group.",
+      "es": "Valor de autocomplete inválido: {{x}}. El elemento no pertenece al grupo de controles de fecha."
+    },
+    "1_3_5_H98.Purpose": {
+      "en": "Check that the input field serves a purpose identified in the Input Purposes for User Interface Components section; and that the content is implemented using technologies with support for identifying the expected meaning for form input data.",
+      "es": "Verifique que el campo de entrada cumpla un propósito identificado en la sección Propósitos de Entrada para Componentes de Interfaz de Usuario, y que el significado esperado pueda determinarse por software."
+    },
+    "1_3_5_H98.MissingAutocomplete": {
+      "en": "This element does not have an autocomplete attribute. If this field collects information about the user, consider adding one to comply with this Success Criterion.",
+      "es": "Este elemento no tiene un atributo autocomplete. Si este campo recopila información personal del usuario, considere añadirlo para cumplir con este Criterio de Conformidad."
+    },
+    "1_3_6_ARIA11.Check": {
+      "en": "Check that the purpose of User Interface Components, icons, and regions can be programmatically determined.",
+      "es": "Verifique que el propósito de los componentes de interfaz de usuario, iconos y regiones pueda determinarse por software."
+    },
+    "1_4_1_G14,G18": {
+      "en": "Check that any information conveyed using colour alone is also available in text, or through other visual cues.",
+      "es": "Verifique que cualquier información transmitida únicamente mediante el color también esté disponible en texto o a través de otras pistas visuales."
+    },
+    "1_4_2_F23": {
+      "en": "If this element contains audio that plays automatically for longer than 3 seconds, check that there is the ability to pause, stop or mute the audio.",
+      "es": "Si este elemento contiene audio que se reproduce automáticamente durante más de 3 segundos, verifique que exista un mecanismo para pausar, detener o silenciar el audio."
+    },
+    "1_4_3_F24.BGColour": {
+      "en": "Check that this element has an inherited foreground colour to complement the corresponding inline background colour or image.",
+      "es": "Verifique que este elemento tenga un color de primer plano heredado que complemente el color o imagen de fondo en línea correspondiente."
+    },
+    "1_4_3_F24.FGColour": {
+      "en": "Check that this element has an inherited background colour or image to complement the corresponding inline foreground colour.",
+      "es": "Verifique que este elemento tenga un color o imagen de fondo heredado que complemente el color de primer plano en línea correspondiente."
+    },
+    "1_4_3_G18_or_G145.Abs": {
+      "en": "This element is absolutely positioned and the background color can not be determined. Ensure the contrast ratio between the text and all covered parts of the background are at least {{required}}:1.",
+      "es": "Este elemento tiene posicionamiento absoluto y no es posible determinar automáticamente el color de fondo. Asegúrese de que la relación de contraste entre el texto y todas las partes cubiertas del fondo sea de al menos {{required}}:1."
+    },
+    "1_4_3_G18_or_G145.BgImage": {
+      "en": "This element's text is placed on a background image. Ensure the contrast ratio between the text and all covered parts of the image are at least {{required}}:1.",
+      "es": "El texto de este elemento está colocado sobre una imagen de fondo. Asegúrese de que la relación de contraste entre el texto y todas las partes cubiertas de la imagen sea de al menos {{required}}:1."
+    },
+    "1_4_3_G18_or_G145.Alpha": {
+      "en": "This element's text or background contains transparency. Ensure the contrast ratio between the text and background are at least {{required}}:1.",
+      "es": "El texto o el fondo de este elemento contienen transparencia. Asegúrese de que la relación de contraste entre el texto y el fondo sea de al menos {{required}}:1."
+    },
+    "1_4_3_G18_or_G145.Fail": {
+      "en": "This element has insufficient contrast at this conformance level. Expected a contrast ratio of at least {{required}}:1, but text in this element has a contrast ratio of {{value}}:1.",
+      "es": "Este elemento tiene un contraste insuficiente para este nivel de conformidad. Se esperaba una relación de contraste de al menos {{required}}:1, pero el texto en este elemento tiene una relación de contraste de {{value}}:1."
+    },
+    "1_4_3_G18_or_G145.Fail.Recomendation": {
+      "en": "Recommendation: ",
+      "es": "Recomendación: "
+    },
+    "1_4_3_G18_or_G145.Fail.Recomendation.Text": {
+      "en": "change text colour to {{value}}",
+      "es": "cambiar el color del texto a {{value}}"
+    },
+    "1_4_3_G18_or_G145.Fail.Recomendation.Background": {
+      "en": "change background to {{value}}",
+      "es": "cambiar el fondo a {{value}}"
+    },
+    "1_4_4_G142": {
+      "en": "Check that text can be resized without assistive technology up to 200 percent without loss of content or functionality.",
+      "es": "Verifique que el texto pueda redimensionarse sin tecnologías de apoyo hasta un 200 por ciento sin pérdida de contenido ni funcionalidad."
+    },
+    "1_4_5_G140,C22,C30.AALevel": {
+      "en": "If the technologies being used can achieve the visual presentation, check that text is used to convey information rather than images of text, except when the image of text is essential to the information being conveyed, or can be visually customised to the user's requirements.",
+      "es": "Si las tecnologías utilizadas pueden lograr la presentación visual, verifique que se utilice texto para transmitir la información en lugar de imágenes de texto, salvo cuando la imagen de texto sea esencial o personalizable."
+    },
+    "1_4_6_G18_or_G17.Abs": {
+      "en": "This element is absolutely positioned and the background color can not be determined. Ensure the contrast ratio between the text and all covered parts of the background are at least {{required}}:1.",
+      "es": "Este elemento tiene posicionamiento absoluto y no es posible determinar automáticamente el color de fondo. Asegúrese de que la relación de contraste entre el texto y todas las partes cubiertas del fondo sea de al menos {{required}}:1."
+    },
+    "1_4_6_G18_or_G17.BgImage": {
+      "en": "This element's text is placed on a background image. Ensure the contrast ratio between the text and all covered parts of the image are at least {{required}}:1.",
+      "es": "El texto de este elemento está colocado sobre una imagen de fondo. Asegúrese de que la relación de contraste entre el texto y todas las partes cubiertas de la imagen sea de al menos {{required}}:1."
+    },
+    "1_4_6_G18_or_G17.Fail": {
+      "en": "This element has insufficient contrast at this conformance level. Expected a contrast ratio of at least {{required}}:1, but text in this element has a contrast ratio of {{value}}:1.",
+      "es": "Este elemento tiene un contraste insuficiente para este nivel de conformidad. Se esperaba una relación de contraste de al menos {{required}}:1, pero el texto en este elemento tiene una relación de contraste de {{value}}:1."
+    },
+    "1_4_6_G18_or_G17.Fail.Recomendation": {
+      "en": "Recommendation: ",
+      "es": "Recomendación: "
+    },
+    "1_4_6_G18_or_G17.Fail.Recomendation.Text": {
+      "en": "change text colour to {{value}}",
+      "es": "cambiar el color del texto a {{value}}"
+    },
+    "1_4_6_G18_or_G17.Fail.Recomendation.Background": {
+      "en": "change background to {{value}}",
+      "es": "cambiar el fondo a {{value}}"
+    },
+    "1_4_7_G56": {
+      "en": "For pre-recorded audio-only content in this element that is primarily speech (such as narration), any background sounds should be muteable, or be at least 20 dB (or about 4 times) quieter than the speech.",
+      "es": "Para el contenido de solo audio pregrabado en este elemento que sea principalmente voz (como narración), cualquier sonido de fondo debe poder silenciarse o ser al menos 20 dB más bajo que la voz."
+    },
+    "1_4_8_G148,G156,G175": {
+      "en": "Check that a mechanism is available for the user to select foreground and background colours for blocks of text, either through the Web page or the browser.",
+      "es": "Verifique que exista un mecanismo para que el usuario seleccione los colores de primer plano y de fondo para los bloques de texto, ya sea mediante la página web o el navegador."
+    },
+    "1_4_8_H87,C20": {
+      "en": "Check that a mechanism exists to reduce the width of a block of text to no more than 80 characters (or 40 in Chinese, Japanese or Korean script).",
+      "es": "Verifique que exista un mecanismo para reducir el ancho de un bloque de texto a no más de 80 caracteres (o 40 en escritura china, japonesa o coreana)."
+    },
+    "1_4_8_C19,G172,G169": {
+      "en": "Check that blocks of text are not fully justified - that is, to both left and right edges - or a mechanism exists to remove full justification.",
+      "es": "Verifique que los bloques de texto no estén completamente justificados (a ambos márgenes izquierdo y derecho), o que exista un mecanismo para eliminar la justificación completa."
+    },
+    "1_4_8_G188,C21": {
+      "en": "Check that line spacing in blocks of text are at least 150% in paragraphs, and paragraph spacing is at least 1.5 times the line spacing, or that a mechanism is available to achieve this.",
+      "es": "Verifique que el interlineado en los bloques de texto sea de al menos el 150% en los párrafos, y el espaciado entre párrafos sea de al menos 1.5 veces el interlineado, o que exista un mecanismo para lograrlo."
+    },
+    "1_4_8_H87,G146,C26": {
+      "en": "Check that text can be resized without assistive technology up to 200 percent without requiring the user to scroll horizontally on a full-screen window.",
+      "es": "Verifique que el texto pueda redimensionarse sin tecnologías de apoyo hasta un 200 por ciento sin requerir desplazamiento horizontal en una ventana a pantalla completa."
+    },
+    "1_4_9_G140,C22,C30.NoException": {
+      "en": "Check that images of text are only used for pure decoration or where a particular presentation of text is essential to the information being conveyed.",
+      "es": "Verifique que las imágenes de texto solo se utilicen con fines puramente decorativos o cuando una presentación particular del texto sea esencial para la información transmitida."
+    },
+    "1_4_10_C32,C31,C33,C38,SCR34,G206.Check": {
+      "en": "Check that content can be presented without loss of information or functionality, and without requiring scrolling in two dimensions for:     Vertical scrolling content at a width equivalent to 320 CSS pixels;     Horizontal scrolling content at a height equivalent to 256 CSS pixels;     Except for parts of the content which require two-dimensional layout for usage or meaning.",
+      "es": "Verifique que el contenido pueda presentarse sin pérdida de información o funcionalidad y sin requerir desplazamiento en dos dimensiones para: contenido de desplazamiento vertical a un ancho equivalente a 320 píxeles CSS; y contenido de desplazamiento horizontal a una altura equivalente a 256 píxeles CSS."
+    },
+    "1_4_10_C32,C31,C33,C38,SCR34,G206.Fixed": {
+      "en": "This element has \"position: fixed\". This may require scrolling in two dimensions, which is considered a failure of this Success Criterion.",
+      "es": "Este elemento tiene \"position: fixed\". Esto puede requerir desplazamiento en dos dimensiones, lo cual se considera un fallo de este Criterio de Conformidad."
+    },
+    "1_4_10_C32,C31,C33,C38,SCR34,G206.Scrolling": {
+      "en": "Preformatted text may require scrolling in two dimensions, which is considered a failure of this Success Criterion.",
+      "es": "El texto preformateado puede requerir desplazamiento en dos dimensiones, lo cual se considera un fallo de este Criterio de Conformidad."
+    },
+    "1_4_10_C32,C31,C33,C38,SCR34,G206.Zoom": {
+      "en": "Interfering with a user agent's ability to zoom may be a failure of this Success Criterion.",
+      "es": "Interferir con la capacidad del navegador del usuario para hacer zoom puede constituir un fallo de este Criterio de Conformidad."
+    },
+    "1_4_11_G195,G207,G18,G145,G174,F78.Check": {
+      "en": "Check that the visual presentation of the following have a contrast ratio of at least 3:1 against adjacent color(s):     User Interface Components: Visual information required to identify user interface components and states, except for inactive components or where the appearance of the component is determined by the user agent and not modified by the author;     Graphical Objects: Parts of graphics required to understand the content, except when a particular presentation of graphics is essential to the information being conveyed.",
+      "es": "Verifique que la presentación visual de los componentes de interfaz de usuario y los objetos gráficos tengan una relación de contraste de al menos 3:1 respecto a los colores adyacentes."
+    },
+    "1_4_12_C36,C35.Check": {
+      "en": "Check that no loss of content or functionality occurs by setting all of the following and by changing no other style property:              Line height (line spacing) to at least 1.5 times the font size;         Spacing following paragraphs to at least 2 times the font size;         Letter spacing (tracking) to at least 0.12 times the font size;         Word spacing to at least 0.16 times the font size.",
+      "es": "Verifique que no se produzca pérdida de contenido ni de funcionalidad al ajustar la altura de línea a al menos 1.5 veces el tamaño de la fuente, el espaciado entre párrafos a 2 veces, el espaciado entre letras a 0.12 veces y el espaciado entre palabras a 0.16 veces el tamaño de la fuente."
+    },
+    "1_4_13_F95.Check": {
+      "en": "Check that where receiving and then removing pointer hover or keyboard focus triggers additional content to become visible and then hidden, the following are true:              Dismissable: A mechanism is available to dismiss the additional content without moving pointer hover or keyboard focus, unless the additional content communicates an input error or does not obscure or replace other content;         Hoverable: If pointer hover can trigger the additional content, then the pointer can be moved over the additional content without the additional content disappearing;         Persistent: The additional content remains visible until the hover or focus trigger is removed, the user dismisses it, or its information is no longer valid.",
+      "es": "Verifique que cuando al recibir y quitar el puntero (hover) o el foco del teclado se muestre y oculte contenido adicional, dicho contenido sea descartable (Dismissable), recorrible con el puntero (Hoverable) y persistente (Persistent)."
+    },
+    "2_1_1_G90": {
+      "en": "Ensure the functionality provided by an event handler for this element is available through the keyboard",
+      "es": "Asegúrese de que la funcionalidad proporcionada por un manejador de eventos en este elemento esté disponible mediante el teclado."
+    },
+    "2_1_1_SCR20.DblClick": {
+      "en": "Ensure the functionality provided by double-clicking on this element is available through the keyboard.",
+      "es": "Asegúrese de que la funcionalidad proporcionada al hacer doble clic en este elemento esté disponible mediante el teclado."
+    },
+    "2_1_1_SCR20.MouseOver": {
+      "en": "Ensure the functionality provided by mousing over this element is available through the keyboard; for instance, using the focus event.",
+      "es": "Asegúrese de que la funcionalidad proporcionada al pasar el ratón sobre este elemento (mouseover) esté disponible mediante el teclado; por ejemplo, usando el evento focus."
+    },
+    "2_1_1_SCR20.MouseOut": {
+      "en": "Ensure the functionality provided by mousing out of this element is available through the keyboard; for instance, using the blur event.",
+      "es": "Asegúrese de que la funcionalidad proporcionada al retirar el ratón de este elemento (mouseout) esté disponible mediante el teclado; por ejemplo, usando el evento blur."
+    },
+    "2_1_1_SCR20.MouseMove": {
+      "en": "Ensure the functionality provided by moving the mouse on this element is available through the keyboard.",
+      "es": "Asegúrese de que la funcionalidad proporcionada al mover el ratón sobre este elemento esté disponible mediante el teclado."
+    },
+    "2_1_1_SCR20.MouseDown": {
+      "en": "Ensure the functionality provided by mousing down on this element is available through the keyboard; for instance, using the keydown event.",
+      "es": "Asegúrese de que la funcionalidad proporcionada al presionar el botón del ratón (mousedown) sobre este elemento esté disponible mediante el teclado; por ejemplo, usando el evento keydown."
+    },
+    "2_1_1_SCR20.MouseUp": {
+      "en": "Ensure the functionality provided by mousing up on this element is available through the keyboard; for instance, using the keyup event.",
+      "es": "Asegúrese de que la funcionalidad proporcionada al soltar el botón del ratón (mouseup) sobre este elemento esté disponible mediante el teclado; por ejemplo, usando el evento keyup."
+    },
+    "2_1_2_F10": {
+      "en": "Check that this applet or plugin provides the ability to move the focus away from itself when using the keyboard.",
+      "es": "Verifique que este applet o plugin proporcione la capacidad de retirar el foco de sí mismo utilizando únicamente el teclado."
+    },
+    "2_1_4.Check": {
+      "en": "Check that if a keyboard shortcut is implemented in content using only letter (including upper- and lower-case letters), punctuation, number, or symbol characters, then at least one of the following is true:              Turn off: A mechanism is available to turn the shortcut off;         Remap: A mechanism is available to remap the shortcut to use one or more non-printable keyboard characters (e.g. Ctrl, Alt, etc);         Active only on focus: The keyboard shortcut for a user interface component is only active when that component has focus.     ",
+      "es": "Verifique que si se implementa un atajo de teclado utilizando únicamente caracteres de letras, puntuación, números o símbolos, sea posible desactivarlo, reasignarlo con teclas modificadoras (Ctrl, Alt, etc.) o que solo esté activo cuando el componente tenga el foco."
+    },
+    "2_2_1_F40.2": {
+      "en": "Meta refresh tag used to redirect to another page, with a time limit that is not zero. Users cannot control this time limit.",
+      "es": "Se utilizó una etiqueta meta refresh para redirigir a otra página con un límite de tiempo distinto de cero. Los usuarios no pueden controlar este límite de tiempo."
+    },
+    "2_2_1_F41.2": {
+      "en": "Meta refresh tag used to refresh the current page. Users cannot control the time limit for this refresh.",
+      "es": "Se utilizó una etiqueta meta refresh para recargar la página actual. Los usuarios no pueden controlar el límite de tiempo de esta recarga."
+    },
+    "2_2_2_SCR33,SCR22,G187,G152,G186,G191": {
+      "en": "If any part of the content moves, scrolls or blinks for more than 5 seconds, or auto-updates, check that there is a mechanism available to pause, stop, or hide the content.",
+      "es": "Si alguna parte del contenido se mueve, se desplaza o parpadea durante más de 5 segundos, o se actualiza automáticamente, verifique que exista un mecanismo para pausar, detener u ocultar dicho contenido."
+    },
+    "2_2_2_F4": {
+      "en": "Ensure there is a mechanism available to stop this blinking element in less than five seconds.",
+      "es": "Asegúrese de que exista un mecanismo disponible para detener este elemento parpadeante en menos de cinco segundos."
+    },
+    "2_2_2_F47": {
+      "en": "Blink elements cannot satisfy the requirement that blinking information can be stopped within five seconds.",
+      "es": "Los elementos blink no pueden satisfacer el requisito de que la información que parpadea pueda detenerse en menos de cinco segundos."
+    },
+    "2_2_3_G5": {
+      "en": "Check that timing is not an essential part of the event or activity presented by the content, except for non-interactive synchronized media and real-time events.",
+      "es": "Verifique que el tiempo no sea una parte esencial del evento o actividad presentada por el contenido, excepto para multimedia sincronizada no interactiva y eventos en tiempo real."
+    },
+    "2_2_4_SCR14": {
+      "en": "Check that all interruptions (including updates to content) can be postponed or suppressed by the user, except interruptions involving an emergency.",
+      "es": "Verifique que todas las interrupciones (incluidas las actualizaciones de contenido) puedan ser pospuestas o suprimidas por el usuario, excepto las interrupciones relacionadas con una emergencia."
+    },
+    "2_2_5_G105,G181": {
+      "en": "If this Web page is part of a set of Web pages with an inactivity time limit, check that an authenticated user can continue the activity without loss of data after re-authenticating.",
+      "es": "Si esta página web forma parte de un conjunto de páginas con un límite de tiempo por inactividad, verifique que un usuario autenticado pueda continuar la actividad sin pérdida de datos tras volver a autenticarse."
+    },
+    "2_2_6.Check": {
+      "en": "Check that users are warned of the duration of any user inactivity that could cause data loss, unless the data is preserved for more than 20 hours when the user does not take any actions.",
+      "es": "Verifique que se advierta a los usuarios de la duración de cualquier inactividad que pueda causar pérdida de datos, a menos que los datos se conserven durante más de 20 horas sin actividad."
+    },
+    "2_3_1_G19,G176": {
+      "en": "Check that no component of the content flashes more than three times in any 1-second period, or that the size of any flashing area is sufficiently small.",
+      "es": "Verifique que ningún componente del contenido destelle más de tres veces en cualquier período de 1 segundo, o que el tamaño del área que destella sea suficientemente pequeño."
+    },
+    "2_3_2_G19": {
+      "en": "Check that no component of the content flashes more than three times in any 1-second period.",
+      "es": "Verifique que ningún componente del contenido destelle más de tres veces en cualquier período de 1 segundo."
+    },
+    "2_3_3.Check": {
+      "en": "Check that motion animation triggered by interaction can be disabled, unless the animation is essential to the functionality or the information being conveyed.",
+      "es": "Verifique que la animación de movimiento activada por interacción pueda desactivarse, a menos que la animación sea esencial para la funcionalidad o la información que se transmite."
+    },
+    "2_4_1_H64.1": {
+      "en": "Iframe element requires a non-empty title attribute that identifies the frame.",
+      "es": "El elemento iframe requiere un atributo title no vacío que identifique el propósito del marco."
+    },
+    "2_4_1_H64.2": {
+      "en": "Check that the title attribute of this element contains text that identifies the frame.",
+      "es": "Verifique que el atributo title de este elemento contenga texto que identifique el marco (frame/iframe)."
+    },
+    "2_4_1_G1,G123,G124,H69": {
+      "en": "Ensure that any common navigation elements can be bypassed; for instance, by use of skip links, header elements, or ARIA landmark roles.",
+      "es": "Asegúrese de que cualquier elemento de navegación común pueda omitirse; por ejemplo, mediante enlaces de salto (skip links), elementos de encabezado o roles de referencia (landmarks) ARIA."
+    },
+    "2_4_1_G1,G123,G124.NoSuchID": {
+      "en": "This link points to a named anchor \"{{id}}\" within the document, but no anchor exists with that name.",
+      "es": "Este enlace apunta a un ancla con nombre \"{{id}}\" dentro del documento, pero no existe ningún ancla con ese nombre o ID."
+    },
+    "2_4_1_G1,G123,G124.NoSuchIDFragment": {
+      "en": "This link points to a named anchor \"{{id}}\" within the document, but no anchor exists with that name in the fragment tested.",
+      "es": "Este enlace apunta a un ancla con nombre \"{{id}}\" dentro del documento, pero no existe ningún ancla con ese nombre en el fragmento evaluado."
+    },
+    "2_4_2_H25.1.NoHeadEl": {
+      "en": "There is no head section in which to place a descriptive title element.",
+      "es": "No existe una sección head en la cual colocar un elemento title descriptivo."
+    },
+    "2_4_2_H25.1.NoTitleEl": {
+      "en": "A title should be provided for the document, using a non-empty title element in the head section.",
+      "es": "Se debe proporcionar un título para el documento mediante un elemento title no vacío en la sección head."
+    },
+    "2_4_2_H25.1.EmptyTitle": {
+      "en": "The title element in the head section should be non-empty.",
+      "es": "El elemento title en la sección head no debe estar vacío."
+    },
+    "2_4_2_H25.2": {
+      "en": "Check that the title element describes the document.",
+      "es": "Verifique que el elemento title describa adecuadamente el tema o propósito del documento."
+    },
+    "2_4_3_H4.2": {
+      "en": "If tabindex is used, check that the tab order specified by the tabindex attributes follows relationships in the content.",
+      "es": "Si se utiliza tabindex, verifique que el orden de tabulación especificado por los atributos tabindex siga una secuencia lógica de relaciones en el contenido."
+    },
+    "2_4_4_H77,H78,H79,H80,H81,H33": {
+      "en": "Check that the link text combined with programmatically determined link context, or its title attribute, identifies the purpose of the link.",
+      "es": "Verifique que el texto del enlace, combinado con el contexto del enlace determinado por software o su atributo title, identifique el propósito del enlace."
+    },
+    "2_4_4_H77,H78,H79,H80,H81": {
+      "en": "Check that the link text combined with programmatically determined link context identifies the purpose of the link.",
+      "es": "Verifique que el texto del enlace, combinado con el contexto del enlace determinado por software, identifique el propósito del enlace."
+    },
+    "2_4_5_G125,G64,G63,G161,G126,G185": {
+      "en": "If this Web page is not part of a linear process, check that there is more than one way of locating this Web page within a set of Web pages.",
+      "es": "Si esta página web no forma parte de un proceso lineal, verifique que exista más de una vía para localizar esta página dentro del sitio web."
+    },
+    "2_4_6_G130,G131": {
+      "en": "Check that headings and labels describe topic or purpose.",
+      "es": "Verifique que los encabezados y las etiquetas describan el tema o propósito."
+    },
+    "2_4_7_G149,G165,G195,C15,SCR31": {
+      "en": "Check that there is at least one mode of operation where the keyboard focus indicator can be visually located on user interface controls.",
+      "es": "Verifique que exista al menos un modo de operación en el que el indicador del foco del teclado sea claramente visible en los controles de la interfaz."
+    },
+    "2_4_8_H59.1": {
+      "en": "Link elements can only be located in the head section of the document.",
+      "es": "Los elementos link solo pueden ubicarse dentro de la sección head del documento."
+    },
+    "2_4_8_H59.2a": {
+      "en": "Link element is missing a non-empty rel attribute identifying the link type.",
+      "es": "Al elemento link le falta un atributo rel no vacío que identifique el tipo de enlace."
+    },
+    "2_4_8_H59.2b": {
+      "en": "Link element is missing a non-empty href attribute pointing to the resource being linked.",
+      "es": "Al elemento link le falta un atributo href no vacío que apunte al recurso enlazado."
+    },
+    "2_4_9_H30": {
+      "en": "Check that text of the link describes the purpose of the link.",
+      "es": "Verifique que el texto del enlace por sí solo describa el propósito del enlace."
+    },
+    "2_5_1.Check": {
+      "en": "Check that all functionality that uses multipoint or path-based gestures for operation can be operated with a single pointer without a path-based gesture, unless a multipoint or path-based gesture is essential.",
+      "es": "Verifique que toda funcionalidad que utilice gestos multipunto o basados en trayectorias pueda operarse con un único puntero sin requerir gestos basados en trayectoria, salvo que sea esencial."
+    },
+    "2_5_2.SinglePointer_Check": {
+      "en": "Check that for functionality that can be operated using a single pointer, at least one of the following is true:         No Down-Event: The down-event of the pointer is not used to execute any part of the function;         Abort or Undo: Completion of the function is on the up-event, and a mechanism is available to abort the function before completion or to undo the function after completion;         Up Reversal: The up-event reverses any outcome of the preceding down-event;         Essential: Completing the function on the down-event is essential.",
+      "es": "Verifique que para la funcionalidad que puede operarse con un solo puntero se cumpla al menos uno de los siguientes puntos: no se ejecuta en el evento de bajada (down-event); se completa en el evento de subida (up-event) con posibilidad de abortar o deshacer; el evento de subida revierte el efecto; o es esencial."
+    },
+    "2_5_2.Mousedown_Check": {
+      "en": "This element has an mousedown event listener. Check that for functionality that can be operated using a single pointer, at least one of the following is true:         No Down-Event: The down-event of the pointer is not used to execute any part of the function;         Abort or Undo: Completion of the function is on the up-event, and a mechanism is available to abort the function before completion or to undo the function after completion;         Up Reversal: The up-event reverses any outcome of the preceding down-event;         Essential: Completing the function on the down-event is essential.",
+      "es": "Este elemento tiene un escuchador de eventos mousedown. Verifique que la acción no se dispare exclusivamente al presionar (down-event) o que pueda cancelarse/deshacerse antes de soltar."
+    },
+    "2_5_2.Touchstart_Check": {
+      "en": "This element has a touchstart event listener. Check that for functionality that can be operated using a single pointer, at least one of the following is true:              No Down-Event: The down-event of the pointer is not used to execute any part of the function;         Abort or Undo: Completion of the function is on the up-event, and a mechanism is available to abort the function before completion or to undo the function after completion;         Up Reversal: The up-event reverses any outcome of the preceding down-event;         Essential: Completing the function on the down-event is essential.",
+      "es": "Este elemento tiene un escuchador de eventos touchstart. Verifique que la acción no se dispare exclusivamente al tocar (down-event) o que pueda cancelarse/deshacerse."
+    },
+    "2_5_3_F96.Check": {
+      "en": "Check that for user interface components with labels that include text or images of text, the name contains the text that is presented visually.",
+      "es": "Verifique que para los componentes de interfaz con etiquetas que incluyan texto o imágenes de texto, el nombre accesible contenga el texto que se presenta visualmente."
+    },
+    "2_5_3_F96.AccessibleName": {
+      "en": "Accessible name for this element does not contain the visible label text. Check that for user interface components with labels that include text or images of text, the name contains the text that is presented visually.",
+      "es": "El nombre accesible de este elemento no contiene el texto de la etiqueta visible. Verifique que el nombre accesible incluya el texto presentado visualmente."
+    },
+    "2_5_4.Check": {
+      "en": "Check that functionality that can be operated by device motion or user motion can also be operated by user interface components and responding to the motion can be disabled to prevent accidental actuation, except when:              Supported Interface: The motion is used to operate functionality through an accessibility supported interface;         Essential: The motion is essential for the function and doing so would invalidate the activity.     ",
+      "es": "Verifique que la funcionalidad operable mediante el movimiento del dispositivo o del usuario también pueda operarse mediante componentes de interfaz estándar y que la respuesta al movimiento pueda desactivarse."
+    },
+    "2_5_4.Devicemotion": {
+      "en": "This element has a devicemotion event listener. Check that functionality that can be operated by device motion or user motion can also be operated by user interface components and responding to the motion can be disabled to prevent accidental actuation, except when:              Supported Interface: The motion is used to operate functionality through an accessibility supported interface;         Essential: The motion is essential for the function and doing so would invalidate the activity.     ",
+      "es": "Este elemento tiene un escuchador de eventos devicemotion. Verifique que la funcionalidad también pueda operarse mediante controles estándar y que la detección de movimiento pueda desactivarse."
+    },
+    "2_5_5.Check": {
+      "en": "Check that the size of the target for pointer inputs is at least 44 by 44 CSS pixels except when:              Equivalent: The target is available through an equivalent link or control on the same page that is at least 44 by 44 CSS pixels;         Inline: The target is in a sentence or block of text;         User Agent Control: The size of the target is determined by the user agent and is not modified by the author;         Essential: A particular presentation of the target is essential to the information being conveyed.     ",
+      "es": "Verifique que el tamaño del área interactiva para entradas de puntero sea de al menos 44 por 44 píxeles CSS, salvo cuando exista un control equivalente en la página, esté en línea en un párrafo, lo determine el navegador o sea esencial."
+    },
+    "2_5_6.Check": {
+      "en": "Check that the content does not restrict use of input modalities available on a platform except where the restriction is essential, required to ensure the security of the content, or required to respect user settings.",
+      "es": "Verifique que el contenido no restrinja el uso de las modalidades de entrada disponibles en la plataforma (ratón, teclado, pantalla táctil, voz), salvo que sea esencial o requerido por seguridad."
+    },
+    "3_1_1_H57.2": {
+      "en": "The html element should have a lang or xml:lang attribute which describes the language of the document.",
+      "es": "El elemento html debe tener un atributo lang o xml:lang que describa el idioma del documento."
+    },
+    "3_1_1_H57.3.Lang": {
+      "en": "The language specified in the lang attribute of the document element does not appear to be well-formed.",
+      "es": "El idioma especificado en el atributo lang del elemento del documento no parece estar bien formado."
+    },
+    "3_1_1_H57.3.XmlLang": {
+      "en": "The language specified in the xml:lang attribute of the document element does not appear to be well-formed.",
+      "es": "El idioma especificado en el atributo xml:lang del elemento del documento no parece estar bien formado."
+    },
+    "3_1_2_H58": {
+      "en": "Ensure that any change in language is marked using the lang and/or xml:lang attribute on an element, as appropriate.",
+      "es": "Asegúrese de que cualquier cambio de idioma en el contenido esté marcado mediante el atributo lang y/o xml:lang en el elemento correspondiente."
+    },
+    "3_1_2_H58.1.Lang": {
+      "en": "The language specified in the lang attribute of this element does not appear to be well-formed.",
+      "es": "El idioma especificado en el atributo lang de este elemento no parece estar bien formado."
+    },
+    "3_1_2_H58.1.XmlLang": {
+      "en": "The language specified in the xml:lang attribute of this element does not appear to be well-formed.",
+      "es": "El idioma especificado en el atributo xml:lang de este elemento no parece estar bien formado."
+    },
+    "3_1_3_H40,H54,H60,G62,G70": {
+      "en": "Check that there is a mechanism available for identifying specific definitions of words or phrases used in an unusual or restricted way, including idioms and jargon.",
+      "es": "Verifique que exista un mecanismo disponible para identificar definiciones específicas de palabras o expresiones usadas de modo inusual o restringido, incluyendo modismos y jerga."
+    },
+    "3_1_4_G102,G55,G62,H28,G97": {
+      "en": "Check that a mechanism for identifying the expanded form or meaning of abbreviations is available.",
+      "es": "Verifique que exista un mecanismo disponible para identificar la forma expandida o el significado de las abreviaturas."
+    },
+    "3_1_5_G86,G103,G79,G153,G160": {
+      "en": "Where the content requires reading ability more advanced than the lower secondary education level, supplemental content or an alternative version should be provided.",
+      "es": "Cuando el texto requiera una capacidad de lectura más avanzada que el nivel de educación secundaria inferior, debe proporcionarse contenido complementario o una versión alternativa más sencilla."
+    },
+    "3_1_6_H62.1.HTML5": {
+      "en": "Ruby element does not contain an rt element containing pronunciation information for its body text.",
+      "es": "El elemento ruby no contiene un elemento rt con información de pronunciación para el texto de su cuerpo."
+    },
+    "3_1_6_H62.1.XHTML11": {
+      "en": "Ruby element does not contain an rt element containing pronunciation information for the text inside the rb element.",
+      "es": "El elemento ruby no contiene un elemento rt con información de pronunciación para el texto dentro del elemento rb."
+    },
+    "3_1_6_H62.2": {
+      "en": "Ruby element does not contain rp elements, which provide extra punctuation to browsers not supporting ruby text.",
+      "es": "El elemento ruby no contiene elementos rp, los cuales proporcionan puntuación adicional a los navegadores que no soportan texto ruby."
+    },
+    "3_2_1_G107": {
+      "en": "Check that a change of context does not occur when this input field receives focus.",
+      "es": "Verifique que no se produzca un cambio de contexto automático cuando este campo de entrada reciba el foco."
+    },
+    "3_2_2_H32.2": {
+      "en": "This form does not contain a submit button, which creates issues for those who cannot submit the form using the keyboard. Submit buttons are INPUT elements with type attribute \"submit\" or \"image\", or BUTTON elements with type \"submit\" or omitted/invalid.",
+      "es": "Este formulario no contiene un botón de envío (submit), lo que crea problemas para quienes no pueden enviar el formulario usando el teclado. Los botones de envío son elementos INPUT con atributo type \"submit\" o \"image\", o elementos BUTTON con type \"submit\" u omitido."
+    },
+    "3_2_3_G61": {
+      "en": "Check that navigational mechanisms that are repeated on multiple Web pages occur in the same relative order each time they are repeated, unless a change is initiated by the user.",
+      "es": "Verifique que los mecanismos de navegación que se repiten en múltiples páginas web aparezcan en el mismo orden relativo cada vez que se repiten, a menos que el usuario inicie un cambio."
+    },
+    "3_2_4_G197": {
+      "en": "Check that components that have the same functionality within this Web page are identified consistently in the set of Web pages to which it belongs.",
+      "es": "Verifique que los componentes que tienen la misma funcionalidad dentro de esta página web se identifiquen de manera coherente en todo el conjunto de páginas web."
+    },
+    "3_2_5_H83.3": {
+      "en": "Check that this link's link text contains information indicating that the link will open in a new window.",
+      "es": "Verifique que el texto de este enlace contenga información que indique que el enlace se abrirá en una ventana o pestaña nueva."
+    },
+    "3_3_1_G83,G84,G85": {
+      "en": "If an input error is automatically detected in this form, check that the item(s) in error are identified and the error(s) are described to the user in text.",
+      "es": "Si se detecta automáticamente un error de entrada en este formulario, verifique que los elementos con error se identifiquen y que el error se describa al usuario mediante texto."
+    },
+    "3_3_2_G131,G89,G184,H90": {
+      "en": "Check that descriptive labels or instructions (including for required fields) are provided for user input in this form.",
+      "es": "Verifique que se proporcionen etiquetas o instrucciones descriptivas (incluyendo para los campos obligatorios) para la entrada de datos del usuario en este formulario."
+    },
+    "3_3_3_G177": {
+      "en": "Check that this form provides suggested corrections to errors in user input, unless it would jeopardize the security or purpose of the content.",
+      "es": "Verifique que este formulario proporcione sugerencias de corrección ante errores de entrada del usuario, a menos que esto ponga en riesgo la seguridad o el propósito del contenido."
+    },
+    "3_3_4_G98,G99,G155,G164,G168.LegalForms": {
+      "en": "If this form would bind a user to a financial or legal commitment, modify/delete user-controllable data, or submit test responses, ensure that submissions are either reversible, checked for input errors, and/or confirmed by the user.",
+      "es": "Si este formulario compromete al usuario legal o financieramente, modifica/elimina datos controlables por el usuario o envía respuestas de evaluación, asegúrese de que los envíos sean reversibles, validados ante errores y/o confirmados por el usuario."
+    },
+    "3_3_5_G71,G184,G193": {
+      "en": "Check that context-sensitive help is available for this form, at a Web-page and/or control level.",
+      "es": "Verifique que exista ayuda sensible al contexto disponible para este formulario, a nivel de página web y/o de control."
+    },
+    "3_3_6_G98,G99,G155,G164,G168.AllForms": {
+      "en": "Check that submissions to this form are either reversible, checked for input errors, and/or confirmed by the user.",
+      "es": "Verifique que los envíos de este formulario sean reversibles, revisados ante errores de entrada y/o confirmados por el usuario."
+    },
+    "4_1_1_F77": {
+      "en": "Duplicate id attribute value \"{{id}}\" found on the web page.",
+      "es": "Se encontró un valor de atributo id duplicado \"{{id}}\" en la página web."
+    },
+    "4_1_2_H91.A.Empty": {
+      "en": "Anchor element found with an ID but without a href or link text. Consider moving its ID to a parent or nearby element.",
+      "es": "Se encontró un elemento de enlace (a) con un atributo ID pero sin atributo href ni texto de enlace. Considere mover su ID a un elemento padre o cercano."
+    },
+    "4_1_2_H91.A.EmptyWithName": {
+      "en": "Anchor element found with a name attribute but without a href or link text. Consider moving the name attribute to become an ID of a parent or nearby element.",
+      "es": "Se encontró un elemento de enlace (a) con un atributo name pero sin atributo href ni texto de enlace. Considere mover el atributo name para convertirlo en un ID de un elemento padre o cercano."
+    },
+    "4_1_2_H91.A.EmptyNoId": {
+      "en": "Anchor element found with no link content and no name and/or ID attribute.",
+      "es": "Se encontró un elemento de enlace (a) sin contenido de enlace y sin atributo name ni ID."
+    },
+    "4_1_2_H91.A.NoHref": {
+      "en": "Anchor elements should not be used for defining in-page link targets. If not using the ID for other purposes (such as CSS or scripting), consider moving it to a parent element.",
+      "es": "Los elementos de enlace (a) no deben utilizarse para definir destinos de enlaces internos en la página. Si no utiliza el ID para otros fines (como CSS o scripts), considere moverlo a un elemento padre."
+    },
+    "4_1_2_H91.A.Placeholder": {
+      "en": "Anchor element found with link content, but no href, ID or name attribute has been supplied.",
+      "es": "Se encontró un elemento de enlace (a) con contenido de texto, pero no se ha proporcionado ningún atributo href, ID ni name."
+    },
+    "4_1_2_H91.A.NoContent": {
+      "en": "Anchor element found with a valid href attribute, but no link content has been supplied.",
+      "es": "Se encontró un elemento de enlace (a) con un atributo href válido, pero no se ha proporcionado contenido ni texto de enlace."
+    },
+    "4_1_2_input_element": {
+      "en": "input element",
+      "es": "elemento de entrada (input)"
+    },
+    "4_1_2_element_content": {
+      "en": "element content",
+      "es": "contenido del elemento"
+    },
+    "4_1_2_element": {
+      "en": "element",
+      "es": "elemento"
+    },
+    "4_1_2_msg_pattern": {
+      "en": "This {{msgNodeType}} does not have a name available to an accessibility API. Valid names are: {{builtAttrs}}.",
+      "es": "Este {{msgNodeType}} no tiene un nombre accesible disponible para una API de accesibilidad. Los nombres válidos son: {{builtAttrs}}."
+    },
+    "4_1_2_msg_pattern_role_of_button": {
+      "en": "This element has role of \"button\" but does not have a name available to an accessibility API. Valid names are: {{builtAttrs}}.",
+      "es": "Este elemento tiene role=\"button\" pero no tiene un nombre accesible disponible para una API de accesibilidad. Los nombres válidos son: {{builtAttrs}}."
+    },
+    "4_1_2_msg_pattern2": {
+      "en": "This {{msgNodeType}} does not have a value available to an accessibility API.",
+      "es": "Este {{msgNodeType}} no tiene un valor disponible para una API de accesibilidad."
+    },
+    "4_1_2_msg_add_one": {
+      "en": "Add one by adding content to the element.",
+      "es": "Añada uno agregando contenido al elemento."
+    },
+    "4_1_2_msg_pattern3": {
+      "en": "This {{msgNodeType}} does not have an initially selected option. Depending on your HTML version, the value exposed to an accessibility API may be undefined.",
+      "es": "Este {{msgNodeType}} no tiene una opción seleccionada inicialmente. Dependiendo de su versión de HTML, el valor expuesto a una API de accesibilidad puede estar indefinido."
+    },
+    "4_1_2_value_exposed_using_attribute": {
+      "en": "A value is exposed using the {{requiredValue}} attribute.",
+      "es": "Se expone un valor mediante el atributo {{requiredValue}}."
+    },
+    "4_1_2_value_exposed_using_element": {
+      "en": "A value is exposed using the {{requiredValue}} element.",
+      "es": "Se expone un valor mediante el elemento {{requiredValue}}."
+    },
+    "4_1_3_ARIA22,G199,ARIA19,G83,G84,G85,G139,G177,G194,ARIA23.Check": {
+      "en": "Check that status messages can be programmatically determined through role or properties such that they can be presented to the user by assistive technologies without receiving focus.",
+      "es": "Verifique que los mensajes de estado puedan determinarse por software mediante roles o propiedades ARIA para que las tecnologías de apoyo los anuncien al usuario sin necesidad de recibir el foco."
+    }
+  }
+}

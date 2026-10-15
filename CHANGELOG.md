@@ -4,6 +4,31 @@ Historial de cambios del proyecto **Pa11y Batch**, script de automatización par
 
 ---
 
+## Versión 0.1.0
+
+> Fecha: 15-10-2026  
+> Autor: Diego Javier Mena
+
+### Reportes en español, Dashboard HTML consolidado, estándar WCAG, capturas y modo CI/CD
+
+- **Traducción automática de reportes al Español (`es` por defecto, o `en`)**:
+  - Creación de [`locales/htmlcs_es.json`](locales/htmlcs_es.json) con la traducción al español del **100 % del catálogo oficial de `HTML_CodeSniffer` (`244` entradas / `209` reglas WCAG)**.
+  - Incorporación del catálogo unificado [`locales/es.json`](locales/es.json) con las **105 reglas y 100 checks de `axe-core` en español**, las **244 entradas de `HTML_CodeSniffer`** y los **87 criterios de conformidad WCAG 2.2**.
+  - Nuevo procesador [`scripts/format_report.js`](scripts/format_report.js) en Node.js que traduce los hallazgos de `axe` y `htmlcs` (incluyendo interpolación de variables dinámicas `{{...}}`), mapea cada incidencia a su criterio WCAG en español y genera los 5 formatos (`html`, `json`, `csv`, `tsv`, `cli`) completamente en español.
+  - Los reportes individuales HTML ahora incluyen indicadores por severidad, filtros interactivos (*Todos*, *Errores*, *Advertencias*, *Avisos*) y buscador en tiempo real.
+- **Generación automática de Dashboard HTML consolidado (`artifacts/index-report-<timestamp>.html`)**:
+  - Presenta indicadores ejecutivos del lote (Total URLs, Sin hallazgos, Con hallazgos, Total Errores, Total Advertencias) y una tabla accesible con enlaces directos a cada reporte individual y su evidencia visual.
+- **Generación de resumen en CSV (`artifacts/summary-<timestamp>.csv`)**:
+  - Consolida alias, URL, estado, conteo de errores/advertencias/avisos, código de salida, archivo de reporte y captura en un único archivo tabular.
+- **Soporte de estándar WCAG (`WCAG2A`, `WCAG2AA`, `WCAG2AAA`)**:
+  - Selección del nivel de conformidad tanto en modo interactivo como por argumento CLI (`[estandar]`, por defecto `WCAG2AA`).
+- **Captura de pantalla de evidencia opcional (`--screen-capture`)**:
+  - Permite guardar una imagen `.png` (`<alias>-capture-<timestamp>.png`) de cada URL evaluada indicando `si` en el octavo argumento o en el asistente interactivo.
+- **Modo de integración continua (`--ci`)**:
+  - Devuelve código de salida `1` si alguna URL falla técnicamente o `2` si se detectan hallazgos de accesibilidad, permitiendo bloquear pipelines en GitHub Actions o GitLab CI.
+
+------------
+
 ## Versión 0.0.3
 
 > Fecha: 15-10-2026  
