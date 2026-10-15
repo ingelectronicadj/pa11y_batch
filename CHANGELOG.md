@@ -4,6 +4,24 @@ Historial de cambios del proyecto **Pa11y Batch**, script de automatización par
 
 ---
 
+## Versión 0.0.3
+
+> Fecha: 15-10-2026  
+> Autor: Diego Javier Mena
+
+### Ejecución desatendida en CLI, manejo de códigos de salida y documentación en Markdown
+
+- Corrección en el modo por argumentos (CLI): cuando se invoca el script pasando los 4 parámetros obligatorios sin los opcionales (`selector_raiz` y `selectores_ocultos`), ya no se bloquea esperando entrada por teclado (`read`).
+- Incorporación de la opción `-h` / `--help` para consultar la ayuda desde la terminal.
+- Validación numérica para el tiempo de espera (`espera_ms`).
+- Construcción segura de argumentos hacia `pa11y` mediante arreglos de Bash (`PA11Y_ARGS`).
+- Evaluación explícita de los códigos de salida de Pa11y (`0` sin hallazgos, `2` con hallazgos de accesibilidad, `1` fallo técnico de ejecución), eliminando archivos vacíos en caso de fallo y mostrando un resumen consolidado al finalizar el lote.
+- Soporte para ignorar comentarios (`#`), líneas en blanco y retornos de carro (`\r` / CRLF) en el archivo de URLs.
+- Adición de archivo `.gitignore` para excluir `./artifacts`.
+- Conversión de la guía de referencia `docs/comandos_Pa11y.odt` a formato Markdown en [`docs/comandos_Pa11y.md`](docs/comandos_Pa11y.md).
+
+------------
+
 ## Versión 0.0.2
 
 > Fecha: 23-06-2025  

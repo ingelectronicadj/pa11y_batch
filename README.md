@@ -33,8 +33,9 @@ Puedes ejecutarlo con argumentos o de forma interactiva:
 - `<nivel>`: Nivel de severidad (`errors`, `warnings`, `notices`)
 - `<espera_ms>`: Tiempo de espera en milisegundos antes de iniciar el análisis (para garantizar la carga completa de la página)
 - `<archivo_urls>`: Ruta al archivo `.txt` con URLs
-- `[selector_raiz]`: (opcional) Selector CSS para limitar el análisis (ej: #main, .contenido)
-- `[selectores_ocultos]`: (opcional) Selectores CSS a ocultar (separados por coma, ej: .banner,.popup)
+- `[selector_raiz]`: (opcional) Selector CSS para limitar el análisis (ej: `#main`, `.contenido`)
+- `[selectores_ocultos]`: (opcional) Selectores CSS a ocultar (separados por coma, ej: `.banner,.popup`)
+- `-h, --help`: Muestra la ayuda rápida por consola.
 
 **Ejemplo:**
 
@@ -68,9 +69,11 @@ El nombre incluye el alias definido en la lista y un timestamp para identificar 
 - Ejecuta con un tiempo de espera configurable para garantizar que la página cargue completamente antes de la evaluación.
 - Genera reportes individuales en formatos compatibles: `html`, `json`, `csv`, `tsv` o salida por consola (`cli`).
 - Los archivos se guardan automáticamente en la carpeta `./artifacts` con nombres únicos que incluyen alias y timestamp.
-- Uso de --root-element para enfocar el análisis en una sección específica.
-- Uso de --hide-elements para omitir secciones visuales molestas (modales, banners, etc.).
-- Informa en consola si la generación del reporte fue exitosa o fallida por cada URL evaluada.
+- Uso de `--root-element` para enfocar el análisis en una sección específica.
+- Uso de `--hide-elements` para omitir secciones visuales molestas (modales, banners, etc.).
+- Evaluación del código de salida de Pa11y (`0` sin hallazgos, `2` con hallazgos reportados, `1` error de ejecución) y resumen consolidado al finalizar el lote.
+- Soporte para comentarios (`#`) y limpieza de saltos de línea CRLF en el archivo de URLs.
+- Documentación de comandos de referencia en [`docs/comandos_Pa11y.md`](docs/comandos_Pa11y.md).
 
 ## Licencia
 
