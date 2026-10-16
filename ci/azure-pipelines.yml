@@ -1,0 +1,62 @@
+# Plantilla de Azure DevOps Pipelines para Pa11y Batch
+# Copiar en: azure-pipelines.yml
+
+trigger:
+  branches:
+    include:
+      - main
+      - master
+      - develop
+
+pool:
+  vmImage: "ubuntu-latest"
+
+variables:
+  PA11Y_STANDARD: "WCAG2AA"
+  PA11Y_RUNNERS: "ambos"
+  PA11Y_LEVEL: "warnings"
+  PA11Y_WAIT: "3000"
+  PA11Y_LANG: "es"
+  PA11Y_THRESHOLD: "0"
+
+steps:
+  - task: NodeTool@0
+    displayName: "Instalar Node.js 22"
+    inputs:
+      versionSpec: "22.x"
+
+  - script: |
+      npm install -g pa11y
+    displayName: "Instalar Pa11y"
+
+  - script: |
+      chmod +x ./pa11y_batch.sh
+      ./pa11y_batch.sh \
+        --urls urls.txt \
+        --format html \
+        --level $(PA11Y_LEVEL) \
+        --wait $(PA11Y_WAIT) \
+        --standard $(PA11Y_STANDARD) \
+        --runners $(PA11Y_RUNNERS) \
+        --lang $(PA11Y_LANG) \
+        --screenshot si \
+        --threshold $(PA11Y_THRESHOLD) \
+        --ci
+    displayName: "Ejecutar Auditoria de Accesibilidad (Pa11y Batch)"
+
+  - task: PublishTestResults@2
+    displayName: "Publicar resultados JUnit XML en pestaña Tests"
+    condition: always()
+    inputs:
+      testResultsFormat: "JUnit"
+      testResultsFiles: "artifacts/latest/junit.xml"
+      testRunTitle: "Accesibilidad Web ($(PA11Y_STANDARD))"
+      failTaskOnFailedTests: false
+
+  - task: PublishBuildArtifacts@1
+    displayName: "Publicar reportes HTML, CSV y capturas de evidencia"
+    condition: always()
+    inputs:
+      PathtoPublish: "artifacts/latest"
+      ArtifactName: "pa11y-accessibility-reports"
+      publishLocation: "Container"

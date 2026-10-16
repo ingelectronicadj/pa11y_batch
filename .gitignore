@@ -1,3 +1,34 @@
+# Directorios de reportes y artefactos generados
 artifacts/
-.DS_Store
+reports/
+
+# Reportes y capturas sueltas en caso de ejecución manual fuera de artifacts/
+*-report.html
+*-report.json
+*-report.csv
+*-report.tsv
+*-report.cli
+*-findings.csv
+*-capture.png
+findings-consolidated.csv
+wcag-matrix.csv
+summary.csv
+summary.md
+runs-history.csv
+junit.xml
+gl-code-quality-report.json
+.ci-items.jsonl
+pa11y-config-*.json
+
+# Dependencias y logs
 node_modules/
+*.log
+npm-debug.log*
+
+# Variables de entorno y archivos del sistema/IDE
+.env
+.env.*
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

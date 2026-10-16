@@ -1,0 +1,35 @@
+# Plantilla de GitLab CI/CD para Pa11y Batch
+# Copiar o incluir en: .gitlab-ci.yml
+
+stages:
+  - accessibility
+
+variables:
+  PA11Y_FORMAT: "html"
+  PA11Y_LEVEL: "warnings"
+  PA11Y_WAIT: "3000"
+  PA11Y_STANDARD: "WCAG2AA"
+  PA11Y_RUNNERS: "ambos"
+  PA11Y_LANG: "es"
+  PA11Y_SCREENSHOT: "si"
+  PA11Y_THRESHOLD: "0"
+
+pa11y_accessibility_audit:
+  stage: accessibility
+  image: node:22-bookworm
+  before_script:
+    - apt-get update && apt-get install -y chromium fonts-liberation libnss3 libatk-bridge2.0-0 libgtk-3-0 libgbm1 --no-install-recommends
+    - export PUPPETEER_SKIP_DOWNLOAD=true
+    - export PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
+    - npm install -g pa11y
+  script:
+    - chmod +x ./pa11y_batch.sh
+    - ./pa11y_batch.sh --urls urls.txt --ci
+  artifacts:
+    when: always
+    expire_in: 30 days
+    paths:
+      - artifacts/latest/
+    reports:
+      junit: artifacts/latest/junit.xml
+      codequality: artifacts/latest/gl-code-quality-report.json

@@ -4,6 +4,33 @@ Historial de cambios del proyecto **Pa11y Batch**, script de automatización par
 
 ---
 
+## Versión 0.2.0
+
+> Fecha: 16-10-2026  
+> Autor: Diego Javier Mena
+
+### Integración Continua (GitHub Actions, GitLab CI, Azure DevOps), Organización de Artefactos y Filtros Avanzados
+
+- **Artefactos nativos de CI/CD (`scripts/generate_ci_reports.js`)**:
+  - Generación automática de **`junit.xml`** compatible con `PublishTestResults@2` de Azure DevOps, `artifacts:reports:junit` de GitLab CI y GitHub Actions.
+  - Generación automática de **`gl-code-quality-report.json`** compatible con el widget de **Code Quality** en Merge Requests de GitLab.
+  - Generación automática de **`summary.md`** con inyección directa en `$GITHUB_STEP_SUMMARY` (GitHub Actions) y `##vso[task.uploadsummary]` (Azure DevOps), además de anotaciones `::error` y `##vso[task.logissue]`.
+- **CLI con banderas con nombre (`--urls`, `--format`, `--threshold`, `--ci`), variables `PA11Y_*` y soporte Docker**:
+  - Soporte completo para argumentos con nombre y variables de entorno además del modo posicional e interactivo.
+  - Nuevo parámetro `--threshold <N>` (`PA11Y_THRESHOLD`) para definir el umbral de errores permitidos antes de fallar el quality gate en `--ci`.
+  - Configuración automática de Chromium con `--no-sandbox`, `--disable-setuid-sandbox` y `--disable-dev-shm-usage` para ejecución estable en contenedores Linux de CI/CD.
+  - Plantillas listas para usar en [`ci/github-actions.yml`](ci/github-actions.yml), [`ci/gitlab-ci.yml`](ci/gitlab-ci.yml) y [`ci/azure-pipelines.yml`](ci/azure-pipelines.yml).
+- **Gestión organizada de archivos en `./artifacts` y Sistema de 4 CSVs de Auditoría**:
+  - Cada ejecución se almacena en `./artifacts/YYYY-MM-DD_HH-MM-SS/` con nombres limpios (`index.html`, `summary.csv`, `findings-consolidated.csv`, `wcag-matrix.csv`, `<alias>-report.html`, `<alias>-findings.csv`, `<alias>-capture.png`), se replica en `./artifacts/latest/` y actualiza el **Centro de Reportes** raíz (`./artifacts/index.html`).
+  - Nuevos archivos CSV con **BOM UTF-8 (`\uFEFF`)** para apertura directa en Microsoft Excel:
+    - `findings-consolidated.csv` y `<alias>-findings.csv` con **23 columnas** (`ID_Hallazgo`, `Principio_WCAG`, `Pauta_WCAG`, `Criterio_WCAG`, `Nombre_Criterio_WCAG`, `Nivel_WCAG`, `Nivel_Impacto`, `Elemento_HTML`, `Descripcion_Hallazgo_ES`, `Recomendacion_Tecnica`, `URL_Documentacion`, `Selector_CSS`, `Fragmento_HTML`, etc.).
+    - `wcag-matrix.csv` con **14 columnas** agrupadas por criterio WCAG.
+    - `summary.csv` enriquecido a **25 columnas** incluyendo conteos por nivel de impacto, por los 4 Principios WCAG y el Top 3 de criterios más afectados por URL.
+- **Rediseño Frontend Ejecutivo y Responsivo (Desktop, Tablet y Mobile — WCAG 1.4.10 Reflow)**:
+  - Nuevo sistema visual unificado con **Tema Claro / Oscuro** persistente, visor de fragmentos HTML con resaltado de sintaxis y numeración de líneas sin scroll horizontal, selectores CSS tokenizados, visor modal (`<dialog>`) de evidencia visual en las 3 vistas y tablas adaptativas que se convierten en tarjetas en dispositivos móviles y tablets.
+
+------------
+
 ## Versión 0.1.0
 
 > Fecha: 15-10-2026  
@@ -13,9 +40,11 @@ Historial de cambios del proyecto **Pa11y Batch**, script de automatización par
 
 - **Traducción automática de reportes al Español (`es` por defecto, o `en`)**:
   - Creación de [`locales/htmlcs_es.json`](locales/htmlcs_es.json) con la traducción al español del **100 % del catálogo oficial de `HTML_CodeSniffer` (`244` entradas / `209` reglas WCAG)**.
-  - Incorporación del catálogo unificado [`locales/es.json`](locales/es.json) con las **105 reglas y 100 checks de `axe-core` en español**, las **244 entradas de `HTML_CodeSniffer`** y los **87 criterios de conformidad WCAG 2.2**.
-  - Nuevo procesador [`scripts/format_report.js`](scripts/format_report.js) en Node.js que traduce los hallazgos de `axe` y `htmlcs` (incluyendo interpolación de variables dinámicas `{{...}}`), mapea cada incidencia a su criterio WCAG en español y genera los 5 formatos (`html`, `json`, `csv`, `tsv`, `cli`) completamente en español.
-  - Los reportes individuales HTML ahora incluyen indicadores por severidad, filtros interactivos (*Todos*, *Errores*, *Advertencias*, *Avisos*) y buscador en tiempo real.
+  - Incorporación del catálogo unificado [`locales/es.json`](locales/es.json) con las **105 reglas y 100 checks de `axe-core` en español**, el mapeo `axeToWcag` de las 105 reglas hacia sus criterios WCAG 2.2, las **244 entradas de `HTML_CodeSniffer`** y los **87 criterios de conformidad WCAG 2.2**.
+  - Nuevo procesador [`scripts/format_report.js`](scripts/format_report.js) en Node.js que traduce los hallazgos de `axe` y `htmlcs` (incluyendo interpolación de variables dinámicas `{{...}}` y nivel de impacto `Crítico`, `Serio`, `Moderado`, `Menor`), mapea cada incidencia de ambos motores a su criterio WCAG en español y genera los 5 formatos (`html`, `json`, `csv`, `tsv`, `cli`) completamente en español.
+  - Los reportes individuales HTML ahora incluyen indicadores por severidad y por motor (`axe` / `htmlcs`), filtros interactivos combinables por **Severidad** (*Todos*, *Errores*, *Advertencias*, *Avisos*) y por **Motor** (*Todos*, *axe*, *htmlcs*), y buscador en tiempo real.
+- **Selección de motores de evaluación (`ambos`, `axe`, `htmlcs`)**:
+  - Permite ejecutar ambos motores (`axe + htmlcs`), únicamente `axe` o únicamente `htmlcs` tanto desde el asistente interactivo como por argumento CLI (`[motores]`).
 - **Generación automática de Dashboard HTML consolidado (`artifacts/index-report-<timestamp>.html`)**:
   - Presenta indicadores ejecutivos del lote (Total URLs, Sin hallazgos, Con hallazgos, Total Errores, Total Advertencias) y una tabla accesible con enlaces directos a cada reporte individual y su evidencia visual.
 - **Generación de resumen en CSV (`artifacts/summary-<timestamp>.csv`)**:

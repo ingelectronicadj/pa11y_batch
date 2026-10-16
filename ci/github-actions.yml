@@ -1,0 +1,64 @@
+# Plantilla de GitHub Actions para Pa11y Batch
+# Copiar en: .github/workflows/accessibility-audit.yml
+
+name: Auditoria de Accesibilidad WCAG (Pa11y Batch)
+
+on:
+  push:
+    branches: [main, master, develop]
+  pull_request:
+    branches: [main, master, develop]
+  workflow_dispatch:
+    inputs:
+      standard:
+        description: "Estandar WCAG (WCAG2A, WCAG2AA, WCAG2AAA)"
+        required: false
+        default: "WCAG2AA"
+      runners:
+        description: "Motores (ambos, axe, htmlcs)"
+        required: false
+        default: "ambos"
+      threshold:
+        description: "Umbral maximo de errores permitidos"
+        required: false
+        default: "0"
+
+jobs:
+  a11y-audit:
+    name: Evaluacion WCAG 2.2 en Español
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout del repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Instalar Pa11y globalmente
+        run: npm install -g pa11y
+
+      - name: Ejecutar Pa11y Batch (Modo CI)
+        run: |
+          chmod +x ./pa11y_batch.sh
+          ./pa11y_batch.sh \
+            --urls urls.txt \
+            --format html \
+            --level warnings \
+            --wait 3000 \
+            --standard "${{ github.event.inputs.standard || 'WCAG2AA' }}" \
+            --runners "${{ github.event.inputs.runners || 'ambos' }}" \
+            --lang es \
+            --screenshot si \
+            --threshold "${{ github.event.inputs.threshold || '0' }}" \
+            --ci
+
+      - name: Publicar artefactos de reportes (HTML, CSV, JUnit, Capturas)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pa11y-accessibility-reports
+          path: artifacts/latest/
+          retention-days: 30
