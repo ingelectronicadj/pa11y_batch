@@ -4,6 +4,28 @@ Historial de cambios del proyecto **Pa11y Batch**, script de automatización par
 
 ---
 
+## Versión 0.3.0
+
+> Fecha: 19-10-2026  
+> Autor: Diego Javier Mena
+
+### Reportes Públicos para Stakeholders, Deep-Linking por URL e Inspección Visual de Hallazgos
+
+- **Inspección Visual del Error en cada Tarjeta (`scripts/capture_visual_coords.js` + `scripts/format_report.js`)**:
+  - Extracción automática mediante Puppeteer de las **coordenadas exactas en el DOM (`x, y, width, height`)**, **recorte gráfico de primer plano (`cropDataUrl`)** con recuadro resaltador sobre el componente afectado y **colores computados reales (`fgHex`, `bgHex`)**.
+  - Botón **"Ver señalado en página completa (`x, y px`)"** que abre el visor modal, posiciona el indicador `#A11Y-XXXX` sobre las coordenadas exactas de la captura general y desplaza la vista automáticamente hasta el elemento.
+  - **Simulador Visual de Contraste (`1.4.3`)**: Muestra lado a lado la apariencia actual del texto con los colores reales extraídos de la interfaz frente a una referencia accesible (`>= 4.5:1`).
+  - **Simulador de Experiencia en Tecnologías de Apoyo**: Compara la experiencia actual en lectores de pantalla (*VoiceOver / NVDA / Teclado*) frente al comportamiento accesible esperado.
+- **Modo `"Vista Stakeholders"` vs `"Vista Ingeniería"` y Deep-Linking por URL**:
+  - Conmutador interactivo para presentar un informe limpio a negocio/producto (ocultando selectores CSS y bloques HTML) con **Distribución por los 4 Principios WCAG (POUR)**, **Perfiles de Personas Usuarias Afectadas** y **Priorización de Sprint (Análisis de Pareto 80/20)** priorizando errores bloqueantes.
+  - Sincronización bidireccional de filtros en la URL (`?view=executive&type=error&runner=axe&wcag=...&q=...`) y enlaces directos por tarjeta (`#A11Y-0001`), con botones **"Compartir vista (URL)"** y **"Enlace #"**.
+  - Enlaces de técnicas oficiales W3C verificados (`200 OK` hacia `/Techniques/general/`, `/html/`, `/failures/`, `/css/`, `/client-side-script/`, `/aria/`).
+- **Publicación en GitHub Pages (`ci/github-pages-deploy.yml`) y Auditoría Responsiva**:
+  - Nueva plantilla de despliegue automático en GitHub Pages y banderas `--project`, `--auditor` y `--standalone`.
+  - Verificación automatizada de reflujo responsivo (`0` desbordamientos horizontales en `320px`, `390px`, `768px`, `1024px` y `1440px`).
+
+------------
+
 ## Versión 0.2.0
 
 > Fecha: 16-10-2026  

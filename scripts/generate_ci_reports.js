@@ -7,8 +7,8 @@
  *   4. junit.xml                  (Azure DevOps PublishTestResults, GitLab JUnit, GitHub Actions)
  *   5. gl-code-quality-report.json (GitLab CI Code Quality widget en Merge Requests)
  *   6. summary.md                 (GitHub Step Summary $GITHUB_STEP_SUMMARY / Azure DevOps uploadsummary)
- *   7. <run_dir>/index.html       (Dashboard Ejecutivo del Lote con modal de evidencia y 0 scroll horizontal)
- *   8. artifacts/index.html       (Centro de Reportes Raíz con modal de evidencia y 0 scroll horizontal)
+ *   7. <run_dir>/index.html       (Dashboard Ejecutivo del Lote con modal de evidencia, enlaces ejecutivos y compartición URL)
+ *   8. artifacts/index.html       (Centro de Reportes Raíz con indicador de tendencia Delta vs. lote anterior)
  */
 'use strict';
 
@@ -27,7 +27,9 @@ const [
 	level = 'errors',
 	format = 'html',
 	thresholdStr = '0',
-	artifactsRoot = './artifacts'
+	artifactsRoot = './artifacts',
+	projectName = '',
+	auditorName = ''
 ] = process.argv;
 
 if (!runDir) {
@@ -451,6 +453,8 @@ const statusText = gatePassed ? 'APROBADO (Cumple umbral)' : 'FALLIDO (Supera um
 const mdLines = [
 	`# Resumen de Auditoría de Accesibilidad (Pa11y Batch)`,
 	``,
+	projectName ? `- **Proyecto:** ${projectName}` : '',
+	auditorName ? `- **Auditor:** ${auditorName}` : '',
 	`- **Estado del Quality Gate:** **${statusText}** (Umbral permitido: \`${threshold}\` errores)`,
 	`- **ID de Ejecución:** \`${runId}\` (${fecha})`,
 	`- **Estándar WCAG:** \`${standard}\` · **Motores:** \`${runnersLabel}\` · **Severidad:** \`${level}\``,
@@ -458,7 +462,7 @@ const mdLines = [
 	``,
 	`| Alias | URL | Estado | Errores | Advertencias | Avisos | axe | htmlcs | CSV Detallado |`,
 	`| :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :--- |`
-];
+].filter(l => l !== '');
 
 records.forEach(rec => {
 	const est = rec.status === 'failed'
@@ -473,7 +477,47 @@ mdLines.push('');
 fs.writeFileSync(path.join(runDir, 'summary.md'), mdLines.join('\n'), 'utf8');
 
 // ---------------------------------------------------------
-// 7. Estilos y Script Responsivo + Visor Modal para el Dashboard y el Centro de Reportes
+// 7. Actualizar historial y calcular Tendencia (Delta de errores vs lote previo)
+// ---------------------------------------------------------
+const historyCsvPath = path.join(artifactsRoot, 'runs-history.csv');
+if (!fs.existsSync(historyCsvPath)) {
+	fs.writeFileSync(
+		historyCsvPath,
+		'\uFEFF"Run_ID","Fecha","Estandar","Motores","Nivel","Formato","Total_URLs","Errores","Advertencias","Avisos"\n',
+		'utf8'
+	);
+}
+fs.appendFileSync(
+	historyCsvPath,
+	`"${runId}","${fecha}","${standard}","${runnersLabel}","${level}","${format}","${totalUrls}","${totalErrors}","${totalWarnings}","${totalNotices}"\n`,
+	'utf8'
+);
+
+const historyLines = fs.readFileSync(historyCsvPath, 'utf8')
+	.replace(/^\uFEFF/, '')
+	.split('\n')
+	.map(l => l.trim())
+	.filter(l => l && !l.startsWith('"Run_ID"'))
+	.reverse();
+
+let deltaBadgeHtml = '<span class="kpi-sub">Primera ejecución registrada</span>';
+if (historyLines.length >= 2) {
+	const prevCols = historyLines[1].split(',').map(c => c.replace(/^"|"$/g, ''));
+	const prevErr = parseInt(prevCols[7], 10);
+	if (!Number.isNaN(prevErr)) {
+		const diff = totalErrors - prevErr;
+		if (diff < 0) {
+			deltaBadgeHtml = `<span class="kpi-sub" style="color:var(--ok);font-weight:700;">${diff} errores vs. lote anterior (Mejora)</span>`;
+		} else if (diff > 0) {
+			deltaBadgeHtml = `<span class="kpi-sub" style="color:var(--err);font-weight:700;">+${diff} errores vs. lote anterior</span>`;
+		} else {
+			deltaBadgeHtml = `<span class="kpi-sub">Sin variación vs. lote anterior (${prevErr})</span>`;
+		}
+	}
+}
+
+// ---------------------------------------------------------
+// 8. Estilos y Script Responsivo + Visor Modal + Compartición de URL
 // ---------------------------------------------------------
 const SHARED_STYLES = `
     :root {
@@ -675,7 +719,7 @@ const SHARED_STYLES = `
       margin-top: 4px;
       line-height: 1.1;
     }
-    .kpi-sub { font-size: 0.73rem; color: var(--text-muted); margin-top: 4px; }
+    .kpi-sub { font-size: 0.73rem; color: var(--text-muted); margin-top: 4px; display: block; }
     .table-card {
       background: var(--bg-surface);
       border: 1px solid var(--border);
@@ -704,7 +748,6 @@ const SHARED_STYLES = `
       font-size: 0.84rem;
       min-width: 220px;
     }
-    /* Tablas sin barra de scroll horizontal en ningún tamaño */
     table { width: 100%; border-collapse: collapse; text-align: left; }
     th, td {
       padding: 12px 14px;
@@ -776,7 +819,6 @@ const SHARED_STYLES = `
       padding: 2px 7px;
       border-radius: 6px;
     }
-    /* Botón miniatura para abrir el visor modal */
     .thumb-modal-btn {
       background: var(--bg-subtle);
       border: 1px solid var(--border-strong);
@@ -814,7 +856,6 @@ const SHARED_STYLES = `
       font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
       font-size: 0.8em;
     }
-    /* Modal de evidencia visual */
     dialog.capture-modal {
       width: min(94vw, 1080px);
       max-height: 90vh;
@@ -849,10 +890,20 @@ const SHARED_STYLES = `
       border-radius: 8px;
       border: 1px solid var(--border);
     }
-    /* Transformación adaptativa a tarjetas en Tablet y Mobile (<= 860px): CERO scroll horizontal */
     @media (max-width: 860px) {
-      .topbar { padding: 10px 14px; }
-      main { padding: 0 14px; margin-top: 14px; }
+      .topbar {
+        position: relative;
+        padding: 10px 14px;
+      }
+      .topbar-actions {
+        width: 100%;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        padding-bottom: 2px;
+        -webkit-overflow-scrolling: touch;
+      }
+      .topbar-actions > * { flex-shrink: 0; }
+      main { padding: 0 12px; margin-top: 14px; }
       .hero-card { padding: 16px; }
       .table-search { width: 100%; min-width: 0; }
       table, thead, tbody, th, td, tr { display: block; width: 100%; }
@@ -921,6 +972,7 @@ const MODAL_AND_SCRIPT = `
     (function () {
       var htmlEl = document.documentElement;
       var btnToggleTheme = document.getElementById('btnToggleTheme');
+      var btnSharePageUrl = document.getElementById('btnSharePageUrl');
       function updateLabel (t) {
         if (btnToggleTheme) btnToggleTheme.textContent = t === 'dark' ? 'Tema claro' : 'Tema oscuro';
       }
@@ -937,6 +989,16 @@ const MODAL_AND_SCRIPT = `
           htmlEl.setAttribute('data-theme', next);
           updateLabel(next);
           try { localStorage.setItem('pa11y_batch_theme', next); } catch (_e) {}
+        });
+      }
+      if (btnSharePageUrl) {
+        btnSharePageUrl.addEventListener('click', function () {
+          var orig = btnSharePageUrl.textContent;
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(window.location.href).catch(function () {});
+          }
+          btnSharePageUrl.textContent = 'URL copiada';
+          setTimeout(function () { btnSharePageUrl.textContent = orig; }, 1800);
         });
       }
       var searchUrlInput = document.getElementById('searchUrlInput');
@@ -1002,12 +1064,14 @@ function buildUrlRows (prefix) {
 		}
 
 		const reportHref = rec.reportFilename ? `${prefix}${rec.reportFilename}` : '';
+		const execReportHref = reportHref ? `${reportHref}?view=executive` : '';
 		const csvHref = rec.findingsCsvFilename ? `${prefix}${rec.findingsCsvFilename}` : '';
 		const captureHref = rec.captureFilename ? `${prefix}${rec.captureFilename}` : '';
 
 		const actionsCell = reportHref
 			? `<div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;">
-                 <a href="${escapeHtml(reportHref)}" class="btn btn-primary">Ver reporte &rarr;</a>
+                 <a href="${escapeHtml(execReportHref)}" class="btn" title="Abrir en Vista Ejecutiva para Stakeholders">Stakeholders</a>
+                 <a href="${escapeHtml(reportHref)}" class="btn btn-primary">Ingeniería &rarr;</a>
                  ${csvHref ? `<a href="${escapeHtml(csvHref)}" class="btn" title="Descargar CSV detallado de ${escapeHtml(rec.alias)}">CSV (${tot})</a>` : ''}
                </div>`
 			: '-';
@@ -1047,15 +1111,22 @@ function buildUrlRows (prefix) {
 	}).join('');
 }
 
+const batchTitle = `${projectName ? `${projectName} · ` : ''}Dashboard del Lote ${runId}`;
+const batchOgDesc = `${totalUrls} URLs auditadas (${standard}): ${totalErrors} Errores WCAG, ${totalWarnings} Advertencias`;
+
 // ---------------------------------------------------------
-// 8. Generar Dashboard del Lote (<run_dir>/index.html)
+// 9. Generar Dashboard del Lote (<run_dir>/index.html)
 // ---------------------------------------------------------
 const batchDashboardHtml = `<!DOCTYPE html>
 <html lang="es" data-theme="light">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Dashboard del Lote · ${escapeHtml(runId)} · Pa11y Batch</title>
+  <title>${escapeHtml(batchTitle)}</title>
+  <meta name="description" content="${escapeHtml(batchOgDesc)}" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="${escapeHtml(batchTitle)}" />
+  <meta property="og:description" content="${escapeHtml(batchOgDesc)}" />
   <style>${SHARED_STYLES}</style>
 </head>
 <body>
@@ -1069,11 +1140,11 @@ const batchDashboardHtml = `<!DOCTYPE html>
         <span class="current" aria-current="page">Lote ${escapeHtml(runId)}</span>
       </div>
       <div class="topbar-actions">
+        <button type="button" id="btnSharePageUrl" class="btn">Compartir URL</button>
         <a href="findings-consolidated.csv" class="btn btn-primary">CSV Maestro Hallazgos (${globalIdx})</a>
         <a href="wcag-matrix.csv" class="btn">Matriz WCAG (CSV)</a>
         <a href="summary.csv" class="btn">Resumen URLs (CSV)</a>
         <a href="junit.xml" class="btn">JUnit XML</a>
-        <a href="gl-code-quality-report.json" class="btn">GitLab Code Quality</a>
         <button type="button" id="btnToggleTheme" class="btn" aria-label="Alternar tema claro u oscuro">Tema oscuro</button>
       </div>
     </div>
@@ -1083,7 +1154,7 @@ const batchDashboardHtml = `<!DOCTYPE html>
     <header class="hero-card">
       <div>
         <div class="hero-eyebrow">
-          <span>Pa11y Batch Audit</span>
+          <span>${escapeHtml(projectName || 'Pa11y Batch Audit')}</span>
           <span>&middot;</span>
           <span class="badge ${gatePassed ? 'status-ok' : 'status-err'}">
             <span class="dot" aria-hidden="true"></span>
@@ -1093,8 +1164,8 @@ const batchDashboardHtml = `<!DOCTYPE html>
         <h1>Dashboard Ejecutivo del Lote · ${escapeHtml(fecha)}</h1>
         <div class="meta">
           ID: <code>${escapeHtml(runId)}</code> &middot; Estándar: <strong>${escapeHtml(standard)}</strong> &middot;
-          Motores: <strong>${escapeHtml(runnersLabel)}</strong> &middot; Severidad: <strong>${escapeHtml(level)}</strong> &middot;
-          Formato: <strong>${escapeHtml(format)}</strong>
+          Motores: <strong>${escapeHtml(runnersLabel)}</strong> &middot; Severidad: <strong>${escapeHtml(level)}</strong>
+          ${auditorName ? ` &middot; Auditor: <strong>${escapeHtml(auditorName)}</strong>` : ''}
         </div>
       </div>
     </header>
@@ -1103,27 +1174,27 @@ const batchDashboardHtml = `<!DOCTYPE html>
       <div class="kpi-card">
         <div class="kpi-label">URLs Evaluadas</div>
         <div class="kpi-value">${totalUrls}</div>
-        <div class="kpi-sub">${cleanUrls} sin hallazgos · ${issuesUrls} con hallazgos</div>
+        <span class="kpi-sub">${cleanUrls} sin hallazgos · ${issuesUrls} con hallazgos</span>
       </div>
       <div class="kpi-card kpi-err">
         <div class="kpi-label">Total Errores WCAG</div>
         <div class="kpi-value" style="color: var(--err);">${totalErrors}</div>
-        <div class="kpi-sub">Umbral CI configurado: ${threshold}</div>
+        ${deltaBadgeHtml}
       </div>
       <div class="kpi-card kpi-warn">
         <div class="kpi-label">Total Advertencias</div>
         <div class="kpi-value" style="color: var(--warn);">${totalWarnings}</div>
-        <div class="kpi-sub">Revisiones manuales sugeridas</div>
+        <span class="kpi-sub">Revisiones manuales sugeridas</span>
       </div>
       <div class="kpi-card kpi-axe">
         <div class="kpi-label">Hallazgos axe-core</div>
         <div class="kpi-value">${totalAxe}</div>
-        <div class="kpi-sub">Motor Deque axe-core</div>
+        <span class="kpi-sub">Motor Deque axe-core</span>
       </div>
       <div class="kpi-card kpi-htmlcs">
         <div class="kpi-label">Hallazgos HTML_CodeSniffer</div>
         <div class="kpi-value">${totalHtmlcs}</div>
-        <div class="kpi-sub">Motor Squiz HTMLCS</div>
+        <span class="kpi-sub">Motor Squiz HTMLCS</span>
       </div>
     </section>
 
@@ -1141,7 +1212,7 @@ const batchDashboardHtml = `<!DOCTYPE html>
             <th scope="col">Advertencias</th>
             <th scope="col">Motores</th>
             <th scope="col">Evidencia</th>
-            <th scope="col">Acciones</th>
+            <th scope="col">Vistas del Reporte</th>
           </tr>
         </thead>
         <tbody>${buildUrlRows('')}
@@ -1156,29 +1227,8 @@ const batchDashboardHtml = `<!DOCTYPE html>
 fs.writeFileSync(path.join(runDir, 'index.html'), batchDashboardHtml + '\n', 'utf8');
 
 // ---------------------------------------------------------
-// 9. Actualizar historial y generar Centro de Reportes Raíz (artifacts/index.html)
+// 10. Generar Centro de Reportes Raíz (artifacts/index.html)
 // ---------------------------------------------------------
-const historyCsvPath = path.join(artifactsRoot, 'runs-history.csv');
-if (!fs.existsSync(historyCsvPath)) {
-	fs.writeFileSync(
-		historyCsvPath,
-		'\uFEFF"Run_ID","Fecha","Estandar","Motores","Nivel","Formato","Total_URLs","Errores","Advertencias","Avisos"\n',
-		'utf8'
-	);
-}
-fs.appendFileSync(
-	historyCsvPath,
-	`"${runId}","${fecha}","${standard}","${runnersLabel}","${level}","${format}","${totalUrls}","${totalErrors}","${totalWarnings}","${totalNotices}"\n`,
-	'utf8'
-);
-
-const historyLines = fs.readFileSync(historyCsvPath, 'utf8')
-	.replace(/^\uFEFF/, '')
-	.split('\n')
-	.map(l => l.trim())
-	.filter(l => l && !l.startsWith('"Run_ID"'))
-	.reverse();
-
 const historyRowsHtml = historyLines.map((line, idx) => {
 	const cols = line.split(',').map(c => c.replace(/^"|"$/g, ''));
 	const [hRun, hDate, hStd, hRunn, , , hUrls, hErr, hWarn] = cols;
@@ -1211,12 +1261,18 @@ const historyRowsHtml = historyLines.map((line, idx) => {
             </tr>`;
 }).join('');
 
+const portalTitle = `${projectName ? `${projectName} · ` : ''}Centro de Reportes de Accesibilidad`;
+
 const rootPortalHtml = `<!DOCTYPE html>
 <html lang="es" data-theme="light">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Centro de Reportes de Accesibilidad · Pa11y Batch</title>
+  <title>${escapeHtml(portalTitle)}</title>
+  <meta name="description" content="${escapeHtml(batchOgDesc)}" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="${escapeHtml(portalTitle)}" />
+  <meta property="og:description" content="${escapeHtml(batchOgDesc)}" />
   <style>${SHARED_STYLES}</style>
 </head>
 <body>
@@ -1225,9 +1281,10 @@ const rootPortalHtml = `<!DOCTYPE html>
   <nav class="topbar" aria-label="Navegación principal">
     <div class="topbar-inner">
       <div class="breadcrumbs">
-        <span class="current" aria-current="page">Centro de Reportes · Pa11y Batch</span>
+        <span class="current" aria-current="page">${escapeHtml(portalTitle)}</span>
       </div>
       <div class="topbar-actions">
+        <button type="button" id="btnSharePageUrl" class="btn">Compartir URL</button>
         <a href="latest/findings-consolidated.csv" class="btn btn-primary">Último CSV Maestro Hallazgos (${globalIdx})</a>
         <a href="latest/wcag-matrix.csv" class="btn">Última Matriz WCAG (CSV)</a>
         <a href="latest/summary.csv" class="btn">Último Resumen URLs (CSV)</a>
@@ -1241,13 +1298,13 @@ const rootPortalHtml = `<!DOCTYPE html>
     <header class="hero-card">
       <div>
         <div class="hero-eyebrow">
-          <span>A11Y Audit Hub</span>
+          <span>${escapeHtml(projectName || 'A11Y Audit Hub')}</span>
           <span>&middot;</span>
           <span>WCAG 2.2 Automation</span>
         </div>
         <h1>Centro de Reportes de Accesibilidad Web</h1>
         <div class="meta">
-          Última ejecución registrada: <strong>${escapeHtml(fecha)}</strong> (Lote <code>${escapeHtml(runId)}</code> &middot; ${escapeHtml(standard)} &middot; ${escapeHtml(runnersLabel)})
+          Última ejecución registrada: <strong>${escapeHtml(fecha)}</strong> (Lote <code>${escapeHtml(runId)}</code> &middot; ${escapeHtml(standard)} &middot; ${escapeHtml(runnersLabel)}${auditorName ? ` &middot; Auditor: <strong>${escapeHtml(auditorName)}</strong>` : ''})
         </div>
       </div>
       <a href="${escapeHtml(runId)}/index.html" class="btn btn-primary">Abrir Dashboard del último lote &rarr;</a>
@@ -1257,27 +1314,27 @@ const rootPortalHtml = `<!DOCTYPE html>
       <div class="kpi-card">
         <div class="kpi-label">URLs en Último Lote</div>
         <div class="kpi-value">${totalUrls}</div>
-        <div class="kpi-sub">Ejecución ${escapeHtml(runId)}</div>
+        <span class="kpi-sub">Ejecución ${escapeHtml(runId)}</span>
       </div>
       <div class="kpi-card kpi-err">
         <div class="kpi-label">Errores WCAG</div>
         <div class="kpi-value" style="color: var(--err);">${totalErrors}</div>
-        <div class="kpi-sub">Incumplimientos de nivel ${escapeHtml(standard)}</div>
+        ${deltaBadgeHtml}
       </div>
       <div class="kpi-card kpi-warn">
         <div class="kpi-label">Advertencias</div>
         <div class="kpi-value" style="color: var(--warn);">${totalWarnings}</div>
-        <div class="kpi-sub">Puntos de revisión manual</div>
+        <span class="kpi-sub">Puntos de revisión manual</span>
       </div>
       <div class="kpi-card kpi-axe">
         <div class="kpi-label">axe-core</div>
         <div class="kpi-value">${totalAxe}</div>
-        <div class="kpi-sub">Reglas Deque axe-core</div>
+        <span class="kpi-sub">Reglas Deque axe-core</span>
       </div>
       <div class="kpi-card kpi-htmlcs">
         <div class="kpi-label">HTML_CodeSniffer</div>
         <div class="kpi-value">${totalHtmlcs}</div>
-        <div class="kpi-sub">Técnicas W3C HTMLCS</div>
+        <span class="kpi-sub">Técnicas W3C HTMLCS</span>
       </div>
     </section>
 
@@ -1295,7 +1352,7 @@ const rootPortalHtml = `<!DOCTYPE html>
             <th scope="col">Advertencias</th>
             <th scope="col">Motores</th>
             <th scope="col">Evidencia</th>
-            <th scope="col">Acciones</th>
+            <th scope="col">Vistas del Reporte</th>
           </tr>
         </thead>
         <tbody>${buildUrlRows(`${runId}/`)}

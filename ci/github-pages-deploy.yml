@@ -1,0 +1,79 @@
+# Plantilla de GitHub Actions para Auditar y Publicar Reportes Publicos en GitHub Pages
+# Copiar en: .github/workflows/publish-accessibility-pages.yml
+# Genera una URL publica permanente para compartir con Stakeholders:
+#   https://<tu-usuario>.github.io/<tu-repositorio>/
+
+name: Publicar Reportes de Accesibilidad en GitHub Pages
+
+on:
+  workflow_dispatch:
+    inputs:
+      project_name:
+        description: "Nombre del Proyecto / Cliente para el membrete"
+        required: false
+        default: "Auditoria de Accesibilidad Digital"
+      auditor_name:
+        description: "Nombre del Consultor / Equipo Auditor"
+        required: false
+        default: "Equipo de Accesibilidad"
+      standard:
+        description: "Estandar WCAG (WCAG2A, WCAG2AA, WCAG2AAA)"
+        required: false
+        default: "WCAG2AA"
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  audit-and-publish:
+    name: Ejecutar Pa11y Batch y Desplegar URL Publica
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Checkout del repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Instalar Pa11y
+        run: npm install -g pa11y
+
+      - name: Ejecutar Auditoria con Vista para Stakeholders
+        run: |
+          chmod +x ./pa11y_batch.sh
+          ./pa11y_batch.sh \
+            --urls urls.txt \
+            --format html \
+            --level warnings \
+            --wait 3000 \
+            --standard "${{ github.event.inputs.standard || 'WCAG2AA' }}" \
+            --runners ambos \
+            --lang es \
+            --screenshot si \
+            --project "${{ github.event.inputs.project_name || 'Auditoria de Accesibilidad Digital' }}" \
+            --auditor "${{ github.event.inputs.auditor_name || 'Equipo de Accesibilidad' }}" \
+            --standalone
+
+      - name: Configurar GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Empaquetar Centro de Reportes para GitHub Pages
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: "./artifacts"
+
+      - name: Publicar en GitHub Pages (URL Publica para Stakeholders)
+        id: deployment
+        uses: actions/deploy-pages@v4

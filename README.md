@@ -34,6 +34,8 @@ Puedes ejecutarlo mediante **banderas con nombre** (recomendado para pipelines C
   --runners ambos \
   --lang es \
   --screenshot si \
+  --project "Portal Corporativo" \
+  --auditor "Diego Mena" \
   --threshold 0 \
   --ci
 ```
@@ -49,7 +51,10 @@ Puedes ejecutarlo mediante **banderas con nombre** (recomendado para pipelines C
 | `--lang` | `PA11Y_LANG` | Idioma de traducción: `es` *(default)*, `en`. |
 | `--root, -R` | `PA11Y_ROOT` | Selector CSS raíz opcional (ej. `#main`). |
 | `--hide, -E` | `PA11Y_HIDE` | Selectores CSS a ocultar separados por coma (ej. `.cookie-banner,.ads`). |
-| `--screenshot, -S` | `PA11Y_SCREENSHOT` | Guardar captura `.png` de evidencia (`si` / `no`, por defecto `no`). |
+| `--screenshot, -S` | `PA11Y_SCREENSHOT` | Guardar captura `.png` y recortes visuales de evidencia (`si` / `no`). |
+| `--project, -p` | `PA11Y_PROJECT` | Nombre del proyecto/cliente para el membrete ejecutivo y etiquetas Open Graph. |
+| `--auditor, -a` | `PA11Y_AUDITOR` | Nombre del consultor/equipo auditor en el encabezado de los reportes. |
+| `--standalone` | `PA11Y_STANDALONE` | Incrusta la captura de pantalla en Base64 dentro del `.html` para compartirlo como archivo único. |
 | `--threshold, -T` | `PA11Y_THRESHOLD` | Máximo de errores permitidos en modo `--ci` antes de fallar (`0` por defecto). |
 | `--ci` | `PA11Y_CI` | Activa modo CI/CD: devuelve código `1` en error técnico o `2` si `errores > threshold`. |
 
@@ -111,6 +116,9 @@ El repositorio incluye plantillas listas para producción en la carpeta [`ci/`](
    - Conecta `artifacts/latest/junit.xml` a la pestaña **Tests** del pipeline y `artifacts/latest/gl-code-quality-report.json` al widget **Code Quality** del Merge Request.
 3. **Azure DevOps Pipelines ([`ci/azure-pipelines.yml`](./ci/azure-pipelines.yml))**:
    - Emite directivas `##vso[task.logissue]` y `##vso[task.uploadsummary]`, publica `artifacts/latest/junit.xml` mediante `PublishTestResults@2` y adjunta los reportes HTML con `PublishBuildArtifacts@1`.
+4. **Publicación de Reportes Públicos en GitHub Pages ([`ci/github-pages-deploy.yml`](./ci/github-pages-deploy.yml))**:
+   - Despliega automáticamente el Centro de Reportes y los reportes del lote en **GitHub Pages** (`https://<usuario>.github.io/<repo>/`) para compartir URLs públicas con Stakeholders.
+   - Los reportes soportan **Deep-Linking por URL** (`?view=executive`, `?type=error&wcag=1.4.3`, `#A11Y-0004`), **Vista Ejecutiva para Stakeholders** (Principios POUR, Perfiles de Discapacidad, Priorización de Sprint Pareto 80/20) e **Inspección Visual de Hallazgos** (`scripts/capture_visual_coords.js` con recortes gráficos del componente afectado, localizador de coordenadas en página completa, simulador visual de contraste y comparador de lector de pantalla).
 
 ## Características
 

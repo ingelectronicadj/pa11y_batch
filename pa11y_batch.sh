@@ -13,10 +13,11 @@ fi
 mostrar_ayuda() {
   cat <<EOF
 Uso:
-  1) Con banderas (recomendado para CI/CD en GitHub Actions, GitLab CI, Azure DevOps):
+  1) Con banderas (recomendado para CI/CD y reportes para Stakeholders):
      $0 --urls <archivo_urls> [--format html|json|csv|tsv|cli] [--level errors|warnings|notices]
         [--wait 3000] [--standard WCAG2A|WCAG2AA|WCAG2AAA] [--runners ambos|axe|htmlcs]
         [--lang es|en] [--root "#main"] [--hide ".banner,.ads"] [--screenshot si|no]
+        [--project "Portal Corporativo"] [--auditor "Diego Mena"] [--standalone]
         [--threshold 0] [--ci]
 
   2) Con argumentos posicionales:
@@ -27,11 +28,14 @@ Uso:
 
 Variables de entorno soportadas (para CI/CD):
   PA11Y_FORMAT, PA11Y_LEVEL, PA11Y_WAIT, PA11Y_URLS, PA11Y_ROOT, PA11Y_HIDE,
-  PA11Y_STANDARD, PA11Y_SCREENSHOT, PA11Y_LANG, PA11Y_RUNNERS, PA11Y_THRESHOLD, PA11Y_CI
+  PA11Y_STANDARD, PA11Y_SCREENSHOT, PA11Y_LANG, PA11Y_RUNNERS, PA11Y_PROJECT,
+  PA11Y_AUDITOR, PA11Y_STANDALONE, PA11Y_THRESHOLD, PA11Y_CI
 
 Artefactos generados automáticamente en ./artifacts/latest/ y ./artifacts/<YYYY-MM-DD_HH-MM-SS>/:
-  - index.html                   (Dashboard HTML del lote)
-  - summary.csv                  (Resumen tabular CSV)
+  - index.html                   (Dashboard HTML del lote con acceso a Vista Stakeholders e Ingeniería)
+  - findings-consolidated.csv    (CSV Maestro de 23 columnas con todos los hallazgos)
+  - wcag-matrix.csv              (Matriz de cumplimiento por Criterio WCAG)
+  - summary.csv                  (Resumen tabular enriquecido de 25 columnas por URL)
   - summary.md                   (Resumen Markdown para GitHub Step Summary / Azure DevOps)
   - junit.xml                    (Reporte JUnit XML para Azure DevOps / GitLab CI / GitHub Actions)
   - gl-code-quality-report.json  (Reporte Code Quality para Merge Requests en GitLab CI)
@@ -48,6 +52,9 @@ fi
 # ----------------------------------------
 CI_MODE="${PA11Y_CI:-false}"
 THRESHOLD="${PA11Y_THRESHOLD:-0}"
+PROJECT_NAME="${PA11Y_PROJECT:-}"
+AUDITOR_NAME="${PA11Y_AUDITOR:-}"
+STANDALONE_MODE="${PA11Y_STANDALONE:-false}"
 FLAG_MODE=false
 
 REPORTER="${PA11Y_FORMAT:-}"
@@ -122,6 +129,21 @@ while [[ $# -gt 0 ]]; do
       THRESHOLD="$2"
       FLAG_MODE=true
       shift 2
+      ;;
+    --project|-p)
+      PROJECT_NAME="$2"
+      FLAG_MODE=true
+      shift 2
+      ;;
+    --auditor|-a)
+      AUDITOR_NAME="$2"
+      FLAG_MODE=true
+      shift 2
+      ;;
+    --standalone)
+      STANDALONE_MODE=true
+      FLAG_MODE=true
+      shift
       ;;
     *)
       POSITIONAL_ARGS+=("$1")
@@ -430,6 +452,16 @@ while IFS='|' read -r alias url || [ -n "$alias" ]; do
   pa11y "$url" "${RUN_ARGS[@]}" > "$raw_json_tmp"
   exit_code=$?
 
+  # Si se solicitó captura (o reporte HTML), extraer recortes visuales y coordenadas DOM con Puppeteer
+  if { [ "$exit_code" -eq 0 ] || [ "$exit_code" -eq 2 ]; } && [ -s "$raw_json_tmp" ]; then
+    if [ "$TAKE_SCREENSHOT" = true ] || [ "$REPORTER" = "html" ]; then
+      if [ -z "$capture_filename" ]; then
+        capture_filename="${alias}-capture.png"
+      fi
+      node "$SCRIPT_DIR/scripts/capture_visual_coords.js" "$url" "$raw_json_tmp" "${RUN_DIR}/${capture_filename}" "$WAIT" 2>/dev/null || true
+    fi
+  fi
+
   estado_label=""
   badge_class=""
   report_link="-"
@@ -447,7 +479,7 @@ while IFS='|' read -r alias url || [ -n "$alias" ]; do
   fi
 
   if { [ "$exit_code" -eq 0 ] || [ "$exit_code" -eq 2 ]; } && [ -s "$raw_json_tmp" ]; then
-    stats_line=$(node "$SCRIPT_DIR/scripts/format_report.js" "$raw_json_tmp" "$output_file" "$REPORTER" "$REPORT_LANG" "$alias" "$url" "$STANDARD" "$RUNNERS_LABEL" "$capture_filename" "$CI_JSONL" "$RUN_ID" 2>/dev/null)
+    stats_line=$(node "$SCRIPT_DIR/scripts/format_report.js" "$raw_json_tmp" "$output_file" "$REPORTER" "$REPORT_LANG" "$alias" "$url" "$STANDARD" "$RUNNERS_LABEL" "$capture_filename" "$CI_JSONL" "$RUN_ID" "$PROJECT_NAME" "$AUDITOR_NAME" "$STANDALONE_MODE" 2>/dev/null)
     format_status=$?
 
     if [ "$format_status" -eq 0 ] && [ -s "$output_file" ]; then
@@ -523,7 +555,7 @@ while IFS='|' read -r alias url || [ -n "$alias" ]; do
 done < "$URL_FILE"
 
 # Generar artefactos nativos de CI/CD, Dashboard del lote y Centro de Reportes raíz
-node "$SCRIPT_DIR/scripts/generate_ci_reports.js" "$RUN_DIR" "$RUN_ID" "$FECHA_HUMANA" "$STANDARD" "$RUNNERS_LABEL" "$LEVEL" "$REPORTER" "$THRESHOLD" "$ARTIFACTS_ROOT" 2>/dev/null || true
+node "$SCRIPT_DIR/scripts/generate_ci_reports.js" "$RUN_DIR" "$RUN_ID" "$FECHA_HUMANA" "$STANDARD" "$RUNNERS_LABEL" "$LEVEL" "$REPORTER" "$THRESHOLD" "$ARTIFACTS_ROOT" "$PROJECT_NAME" "$AUDITOR_NAME" 2>/dev/null || true
 
 # Sincronizar carpeta fija ./artifacts/latest/ para pipelines de CI/CD
 rm -rf "$LATEST_DIR"
