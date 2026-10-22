@@ -26,6 +26,9 @@ Uso:
   3) Modo interactivo (sin argumentos):
      $0
 
+  4) Modo Servidor Web Interactivo (Pa11y Batch Web Studio):
+     $0 --web [--port 8098]
+
 Variables de entorno soportadas (para CI/CD):
   PA11Y_FORMAT, PA11Y_LEVEL, PA11Y_WAIT, PA11Y_URLS, PA11Y_ROOT, PA11Y_HIDE,
   PA11Y_STANDARD, PA11Y_SCREENSHOT, PA11Y_LANG, PA11Y_RUNNERS, PA11Y_PROJECT,
@@ -55,6 +58,8 @@ THRESHOLD="${PA11Y_THRESHOLD:-0}"
 PROJECT_NAME="${PA11Y_PROJECT:-}"
 AUDITOR_NAME="${PA11Y_AUDITOR:-}"
 STANDALONE_MODE="${PA11Y_STANDALONE:-false}"
+WEB_MODE=false
+WEB_PORT="${PORT:-8098}"
 FLAG_MODE=false
 
 REPORTER="${PA11Y_FORMAT:-}"
@@ -145,6 +150,14 @@ while [[ $# -gt 0 ]]; do
       FLAG_MODE=true
       shift
       ;;
+    --web|--serve)
+      WEB_MODE=true
+      shift
+      ;;
+    --port)
+      WEB_PORT="$2"
+      shift 2
+      ;;
     *)
       POSITIONAL_ARGS+=("$1")
       shift
@@ -152,6 +165,10 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 set -- "${POSITIONAL_ARGS[@]}"
+
+if [ "$WEB_MODE" = true ]; then
+  exec node "$SCRIPT_DIR/scripts/web_server.js" --port "$WEB_PORT"
+fi
 
 # ----------------------------------------
 # Validar si pa11y está instalado
@@ -319,7 +336,7 @@ fi
 # ----------------------------------------
 # Configuración de Chromium para contenedores CI/Docker (--no-sandbox)
 # ----------------------------------------
-PA11Y_CONFIG_TMP=$(mktemp /tmp/pa11y-config-XXXXXX.json)
+PA11Y_CONFIG_TMP="/tmp/pa11y-config-$$-${RANDOM}.json"
 cat <<EOF > "$PA11Y_CONFIG_TMP"
 {
   "chromeLaunchConfig": {
@@ -437,7 +454,8 @@ while IFS='|' read -r alias url || [ -n "$alias" ]; do
   TOTAL_URLS=$((TOTAL_URLS + 1))
   report_filename="${alias}-report.${REPORTER}"
   output_file="${RUN_DIR}/${report_filename}"
-  raw_json_tmp=$(mktemp)
+  raw_json_tmp="/tmp/pa11y-raw-$$-${TOTAL_URLS}-${RANDOM}.json"
+  pa11y_err_tmp="/tmp/pa11y-err-$$-${TOTAL_URLS}-${RANDOM}.log"
   capture_filename=""
   RUN_ARGS=("${PA11Y_ARGS[@]}")
 
@@ -446,10 +464,11 @@ while IFS='|' read -r alias url || [ -n "$alias" ]; do
     RUN_ARGS+=(--screen-capture "${RUN_DIR}/${capture_filename}")
   fi
 
-  echo "Analizando: $alias → $url"
+  echo "[ETAPA 1/4] Analizando (${TOTAL_URLS}): $alias -> $url"
+  echo "[ETAPA 2/4] Ejecutando motores WCAG ($RUNNERS_LABEL) con espera de ${WAIT}ms..."
   echo "Guardando en: $output_file"
 
-  pa11y "$url" "${RUN_ARGS[@]}" > "$raw_json_tmp"
+  pa11y "$url" "${RUN_ARGS[@]}" > "$raw_json_tmp" 2> "$pa11y_err_tmp"
   exit_code=$?
 
   # Si se solicitó captura (o reporte HTML), extraer recortes visuales y coordenadas DOM con Puppeteer
@@ -458,6 +477,7 @@ while IFS='|' read -r alias url || [ -n "$alias" ]; do
       if [ -z "$capture_filename" ]; then
         capture_filename="${alias}-capture.png"
       fi
+      echo "[ETAPA 3/4] Capturando evidencia visual del DOM y recortes de hallazgos para $alias..."
       node "$SCRIPT_DIR/scripts/capture_visual_coords.js" "$url" "$raw_json_tmp" "${RUN_DIR}/${capture_filename}" "$WAIT" 2>/dev/null || true
     fi
   fi
@@ -479,6 +499,7 @@ while IFS='|' read -r alias url || [ -n "$alias" ]; do
   fi
 
   if { [ "$exit_code" -eq 0 ] || [ "$exit_code" -eq 2 ]; } && [ -s "$raw_json_tmp" ]; then
+    echo "[ETAPA 4/4] Traduciendo hallazgos y compilando reporte interactivo para $alias..."
     stats_line=$(node "$SCRIPT_DIR/scripts/format_report.js" "$raw_json_tmp" "$output_file" "$REPORTER" "$REPORT_LANG" "$alias" "$url" "$STANDARD" "$RUNNERS_LABEL" "$capture_filename" "$CI_JSONL" "$RUN_ID" "$PROJECT_NAME" "$AUDITOR_NAME" "$STANDALONE_MODE" 2>/dev/null)
     format_status=$?
 
@@ -525,6 +546,9 @@ while IFS='|' read -r alias url || [ -n "$alias" ]; do
     fi
   else
     echo "Falló la generación del reporte para $alias (código de salida: $exit_code)"
+    if [ -s "$pa11y_err_tmp" ]; then
+      cat "$pa11y_err_tmp"
+    fi
     rm -f "$output_file"
     FALLIDOS=$((FALLIDOS + 1))
     estado_label="Fallido (Error)"
@@ -533,7 +557,7 @@ while IFS='|' read -r alias url || [ -n "$alias" ]; do
     echo "{\"alias\":\"${alias}\",\"url\":\"${url}\",\"status\":\"failed\",\"exitCode\":${exit_code},\"errorsCount\":0,\"warningsCount\":0,\"noticesCount\":0,\"axeCount\":0,\"htmlcsCount\":0,\"issues\":[]}" >> "$CI_JSONL"
   fi
 
-  rm -f "$raw_json_tmp"
+  rm -f "$raw_json_tmp" "$pa11y_err_tmp"
 
   echo "\"${alias}\",\"${url}\",\"${estado_label}\",\"${url_errors}\",\"${url_warnings}\",\"${url_notices}\",\"${url_axe}\",\"${url_htmlcs}\",\"${exit_code}\",\"${report_filename}\",\"${capture_filename}\"" >> "$SUMMARY_CSV"
 

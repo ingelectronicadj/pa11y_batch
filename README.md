@@ -78,6 +78,18 @@ El script te pedirá los datos paso a paso: formato, nivel de severidad, tiempo 
 ./pa11y_batch.sh
 ``` 
 
+### Opción 4: Pa11y Batch Web Studio (Sitio web interactivo de auditoría y descarga)
+
+Levanta el portal web local donde cualquier persona del equipo puede ingresar una URL (o cargar un lote `.txt`), configurar el estándar WCAG (`WCAG2A`, `WCAG2AA`, `WCAG2AAA`), seguir el progreso en tiempo real (SSE), previsualizar la **Vista Stakeholders** o **Vista Ingeniería** y descargar con un clic el **Reporte HTML autocontenido**, los **CSVs para Excel** o el **paquete completo `.zip`**:
+
+```bash
+./pa11y_batch.sh --web --port 8098
+# O usando npm:
+npm start
+```
+
+Luego abre en el navegador: **`http://localhost:8098/`**.
+
 ## Resultados y Estructura de Artefactos
 
 Cada ejecución se organiza automáticamente en su propia carpeta con fecha y hora legible (`./artifacts/YYYY-MM-DD_HH-MM-SS/`), sincroniza una copia fija en `./artifacts/latest/` para pipelines de CI/CD y actualiza el **Centro de Reportes** en `./artifacts/index.html`:

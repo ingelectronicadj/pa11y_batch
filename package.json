@@ -1,0 +1,16 @@
+{
+  "name": "pa11y-batch",
+  "version": "0.4.0",
+  "description": "Suite de auditoría automatizada de accesibilidad web (WCAG 2.2) por lotes y Web Studio interactivo con axe-core y HTML_CodeSniffer en español.",
+  "main": "scripts/web_server.js",
+  "scripts": {
+    "start": "node scripts/web_server.js",
+    "web": "./pa11y_batch.sh --web"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ingelectronicadj/pa11y_batch.git"
+  },
+  "author": "Diego Mena <ingelectronicadj@gmail.com>",
+  "license": "GPL-3.0"
+}

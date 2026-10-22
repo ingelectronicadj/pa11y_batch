@@ -4,6 +4,24 @@ Historial de cambios del proyecto **Pa11y Batch**, script de automatización par
 
 ---
 
+## Versión 0.4.0
+
+> Fecha: 22-10-2026  
+> Autor: Diego Javier Mena
+
+### Pa11y Batch Web Studio: Sitio Web Interactivo para Auditar URLs y Descargar Reportes
+
+- **Nuevo Servidor e Interfaz Web (`scripts/web_server.js` + `./pa11y_batch.sh --web`)**:
+  - Sitio web interactivo (`http://localhost:8098/`) sin dependencias externas que permite a cualquier persona ingresar una **URL única** o un **lote de URLs** (por texto o subiendo un archivo `.txt`) y ejecutar la auditoría WCAG en vivo desde el navegador.
+  - Configuración completa de **Estándar WCAG** (`WCAG2A`, `WCAG2AA`, `WCAG2AAA`), **Motores** (`axe + htmlcs`, `axe`, `htmlcs`), **Nivel de severidad**, **Idioma** (`es` / `en`), **Evidencia visual DOM**, **Modo Standalone (Base64)** y opciones avanzadas (`--project`, `--auditor`, `--wait`, `--root`, `--hide`).
+  - **Consola de progreso en tiempo real mediante Server-Sent Events (`/api/audit/:jobId/stream`)** con respaldo automático por polling JSON (`/api/audit/:jobId/status`).
+- **Centro de Descargas Directas y Visor Integrado**:
+  - Descarga con un clic del **Reporte HTML autocontenido** (`?download=1`), **Paquete Completo del Lote (`.zip`)** (`/api/runs/:runId/zip`), **CSV Maestro de Hallazgos (23 columnas para Excel)**, **Matriz WCAG (`.csv`)**, **Resumen por URL (`.csv`)** y **JUnit XML**.
+  - Visor interactivo integrado en la misma página para alternar entre **Vista Stakeholders**, **Vista Ingeniería** y **Dashboard Consolidado del Lote**, además de tabla de historial de ejecuciones recientes.
+  - Interfaz validada con el propio Pa11y (`axe-core` + `HTML_CodeSniffer`) con **0 errores y 0 advertencias WCAG 2.2 AA**, soporte de tema claro/oscuro y anuncios `aria-live="polite"`.
+
+------------
+
 ## Versión 0.3.0
 
 > Fecha: 19-10-2026  
