@@ -154,7 +154,7 @@ function extractWcagMetadata (issue, targetLang) {
 	const m = code.match(/(\d)_(\d)_(\d+)/);
 	if (m) {
 		crit = `${m[1]}.${m[2]}.${m[3]}`;
-	} else if (runner === 'axe' && esCatalog.axeToWcag && esCatalog.axeToWcag[code]) {
+	} else if (runner.includes('axe') && esCatalog.axeToWcag && esCatalog.axeToWcag[code]) {
 		crit = esCatalog.axeToWcag[code];
 	}
 
@@ -162,7 +162,7 @@ function extractWcagMetadata (issue, targetLang) {
 		return {
 			criterionNumber: '-',
 			criterionName: '-',
-			wcagCriterion: runner === 'axe' ? `Regla axe: ${code}` : '-',
+			wcagCriterion: runner.includes('axe') ? `Regla axe: ${code}` : '-',
 			wcagLevel: '-',
 			principleNumber: '-',
 			principleName: '-',
@@ -349,7 +349,7 @@ function translateIssue (issue, targetLang, idx) {
 	let translated = issue.message || '';
 	let remediationAdvice = '';
 
-	if (runner === 'axe' && esCatalog.rules && esCatalog.rules[code]) {
+	if (runner.includes('axe') && esCatalog.rules && esCatalog.rules[code]) {
 		const ruleEntry = esCatalog.rules[code];
 		const helpEs = ruleEntry.help || '';
 		const descEs = ruleEntry.description || '';
@@ -703,8 +703,8 @@ const issues = rawIssues.map((i, idx) => translateIssue(i, lang, idx));
 const errorsCount = issues.filter(i => i.type === 'error').length;
 const warningsCount = issues.filter(i => i.type === 'warning').length;
 const noticesCount = issues.filter(i => i.type === 'notice').length;
-const axeCount = issues.filter(i => i.runner === 'axe').length;
-const htmlcsCount = issues.filter(i => i.runner === 'htmlcs').length;
+const axeCount = issues.filter(i => String(i.runner || '').includes('axe')).length;
+const htmlcsCount = issues.filter(i => String(i.runner || '').includes('htmlcs')).length;
 
 const isEs = lang === 'es';
 const nowStr = new Date().toLocaleString(isEs ? 'es-ES' : 'en-US');
@@ -946,7 +946,7 @@ if (format === 'json') {
 		}).join('\n');
 
 	const ogTitle = `${isEs ? 'Auditoría de Accesibilidad' : 'Accessibility Audit'}: ${alias} (${standard})`;
-	const ogDesc = `${errorsCount} ${isEs ? 'Errores WCAG' : 'WCAG Errors'}, ${warningsCount} ${isEs ? 'Advertencias' : 'Warnings'} (${runnersLabel}) — ${targetUrl}`;
+	const ogDesc = `${errorsCount} ${isEs ? 'Errores WCAG' : 'WCAG Errors'}, ${warningsCount} ${isEs ? 'Advertencias' : 'Warnings'} (${runnersLabel}) - ${targetUrl}`;
 
 	const htmlDoc = `<!DOCTYPE html>
 <html lang="${isEs ? 'es' : 'en'}" data-theme="light" data-view-mode="technical">
@@ -2386,7 +2386,7 @@ if (format === 'json') {
         var visible = 0;
         cards.forEach(function (card) {
           var matchesType = activeType === 'all' || card.getAttribute('data-type') === activeType;
-          var matchesRunner = activeRunner === 'all' || card.getAttribute('data-runner') === activeRunner;
+          var matchesRunner = activeRunner === 'all' || (card.getAttribute('data-runner') || '').indexOf(activeRunner) !== -1;
           var matchesWcag = activeWcag === 'all' || (card.getAttribute('data-wcag') || '').indexOf(activeWcag) !== -1;
           var matchesText = !q || card.textContent.toLowerCase().indexOf(q) !== -1;
           var show = matchesType && matchesRunner && matchesWcag && matchesText;

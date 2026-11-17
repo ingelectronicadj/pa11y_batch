@@ -14,19 +14,52 @@ const ROOT_DIR = path.resolve(__dirname, '..');
 const ARTIFACTS_DIR = path.join(ROOT_DIR, 'artifacts');
 const BATCH_SCRIPT = path.join(ROOT_DIR, 'pa11y_batch.sh');
 
-function parseCliPort () {
+function parseCliOptions () {
   const args = process.argv.slice(2);
+  let port = parseInt(process.env.PORT || '8098', 10);
+  let host = process.env.HOST || '127.0.0.1';
+  let allowLocal = process.env.PA11Y_ALLOW_LOCAL === 'true' || process.env.PA11Y_ALLOW_LOCAL === '1';
+
   for (let i = 0; i < args.length; i++) {
     if ((args[i] === '--port' || args[i] === '-p') && args[i + 1]) {
-      const p = parseInt(args[i + 1], 10);
-      if (p > 0 && p < 65536) return p;
+      const p = parseInt(args[++i], 10);
+      if (p > 0 && p < 65536) port = p;
+    } else if (args[i] === '--host' && args[i + 1]) {
+      host = args[++i];
+    } else if (args[i] === '--allow-local-targets') {
+      allowLocal = true;
     }
   }
-  return parseInt(process.env.PORT || '8098', 10);
+  return { port, host, allowLocal };
 }
 
-const PORT = parseCliPort();
+const CLI_OPTS = parseCliOptions();
+const PORT = CLI_OPTS.port;
+const HOST = CLI_OPTS.host;
+const ALLOW_LOCAL_TARGETS = CLI_OPTS.allowLocal;
+const MAX_CONCURRENT_JOBS = Math.max(1, parseInt(process.env.PA11Y_MAX_JOBS || '1', 10) || 1);
+const MAX_JOBS_MEMORY = 40;
 const jobs = new Map();
+const jobQueue = [];
+let activeRunningJobs = 0;
+
+function isPrivateOrMetadataHost (hostname) {
+  const h = String(hostname || '').trim().toLowerCase().replace(/^\[|\]$/g, '');
+  if (!h) return true;
+  if (h === 'localhost' || h === '0.0.0.0' || h === '::1' || h.endsWith('.local') || h.endsWith('.internal')) {
+    return true;
+  }
+  if (/^127\./.test(h) || /^10\./.test(h) || /^192\.168\./.test(h) || /^169\.254\./.test(h)) {
+    return true;
+  }
+  const m172 = h.match(/^172\.(\d{1,3})\./);
+  if (m172) {
+    const oct = parseInt(m172[1], 10);
+    if (oct >= 16 && oct <= 31) return true;
+  }
+  if (/^(fc00:|fd00:|fe80:)/i.test(h)) return true;
+  return false;
+}
 
 function ensureArtifactsDir () {
   if (!fs.existsSync(ARTIFACTS_DIR)) {
@@ -93,6 +126,11 @@ function parseAndValidateUrls (urlsText) {
       validUrl = new URL(rawUrl);
       if (validUrl.protocol !== 'http:' && validUrl.protocol !== 'https:') {
         return { error: `Protocolo no permitido en la línea ${i + 1}: ${rawUrl}` };
+      }
+      if (!ALLOW_LOCAL_TARGETS && isPrivateOrMetadataHost(validUrl.hostname)) {
+        return {
+          error: `Host local o de red privada bloqueado por seguridad SSRF en la línea ${i + 1} (${validUrl.hostname}). Inicia el servidor con --allow-local-targets para auditar entornos locales.`
+        };
       }
     } catch (_e) {
       return { error: `URL inválida en la línea ${i + 1}: "${line}"` };
@@ -294,11 +332,14 @@ function startAuditJob (body) {
   const validRunners = ['ambos', 'axe', 'htmlcs'];
   const validLevels = ['errors', 'warnings', 'notices'];
   const validLangs = ['es', 'en'];
+  const validViewports = ['desktop', 'tablet', 'mobile', 'reflow'];
 
   const standard = validStandards.includes(body.standard) ? body.standard : 'WCAG2AA';
   const runners = validRunners.includes(body.runners) ? body.runners : 'ambos';
   const level = validLevels.includes(body.level) ? body.level : 'warnings';
   const lang = validLangs.includes(body.lang) ? body.lang : 'es';
+  const viewport = validViewports.includes(body.viewport) ? body.viewport : 'desktop';
+  const dedupe = body.dedupe !== false;
   const screenshot = body.screenshot === 'no' ? 'no' : 'si';
   const standalone = body.standalone !== false;
   const waitMs = Math.max(0, Math.min(30000, parseInt(body.wait || '2500', 10) || 2500));
@@ -320,30 +361,62 @@ function startAuditJob (body) {
     '--runners', runners,
     '--level', level,
     '--lang', lang,
+    '--viewport', viewport,
     '--wait', String(waitMs),
     '--screenshot', screenshot
   ];
 
+  if (!dedupe) args.push('--no-dedupe');
   if (standalone) args.push('--standalone');
   if (project) args.push('--project', project);
   if (auditor) args.push('--auditor', auditor);
   if (rootSelector) args.push('--root', rootSelector);
   if (hideSelectors) args.push('--hide', hideSelectors);
 
+  // Purgar trabajos antiguos en memoria para evitar crecimiento ilimitado
+  if (jobs.size >= MAX_JOBS_MEMORY) {
+    for (const [oldId, oldJob] of jobs.entries()) {
+      if (oldJob.status !== 'running' && oldJob.status !== 'queued') {
+        jobs.delete(oldId);
+        if (jobs.size < MAX_JOBS_MEMORY) break;
+      }
+    }
+  }
+
   const job = {
     jobId,
-    status: 'running',
+    status: 'queued',
     createdAt: Date.now(),
     entries: validation.entries,
+    args,
+    tmpUrlsFile,
     logs: [],
     runId: null,
     result: null,
     clients: new Set()
   };
   jobs.set(jobId, job);
+  jobQueue.push(job);
+  drainJobQueue();
 
-  const child = spawn('bash', args, {
+  return { jobId, entries: validation.entries };
+}
+
+function drainJobQueue () {
+  while (activeRunningJobs < MAX_CONCURRENT_JOBS && jobQueue.length > 0) {
+    const job = jobQueue.shift();
+    if (!job || job.status === 'cancelled') continue;
+    executeQueuedJob(job);
+  }
+}
+
+function executeQueuedJob (job) {
+  activeRunningJobs += 1;
+  job.status = 'running';
+
+  const child = spawn('bash', job.args, {
     cwd: ROOT_DIR,
+    detached: process.platform !== 'win32',
     env: {
       ...process.env,
       PATH: `${path.join(os.homedir(), '.npm-global/bin')}:${process.env.PATH || ''}`
@@ -367,14 +440,15 @@ function startAuditJob (body) {
   child.stderr.on('data', processOutputChunk);
 
   child.on('close', (code) => {
+    activeRunningJobs = Math.max(0, activeRunningJobs - 1);
     try {
-      fs.unlinkSync(tmpUrlsFile);
+      fs.unlinkSync(job.tmpUrlsFile);
     } catch (_e) {
       // Ignorado
     }
 
     let details = job.runId ? readRunDetails(job.runId) : null;
-    if (!details) {
+    if (!details && job.status !== 'cancelled') {
       const latestRuns = listRecentRuns();
       if (latestRuns.length > 0) {
         details = latestRuns[0];
@@ -382,12 +456,14 @@ function startAuditJob (body) {
       }
     }
 
-    const hasValidReports = Boolean(
-      details &&
-      Array.isArray(details.items) &&
-      details.items.some(it => it.reportUrl && !String(it.status || '').toLowerCase().includes('fall'))
-    );
-    job.status = hasValidReports ? 'completed' : 'failed';
+    if (job.status !== 'cancelled') {
+      const hasValidReports = Boolean(
+        details &&
+        Array.isArray(details.items) &&
+        details.items.some(it => it.reportUrl && !String(it.status || '').toLowerCase().includes('fall'))
+      );
+      job.status = hasValidReports ? 'completed' : 'failed';
+    }
     job.exitCode = code;
     job.result = details;
 
@@ -405,9 +481,8 @@ function startAuditJob (body) {
       }
     }
     job.clients.clear();
+    drainJobQueue();
   });
-
-  return { jobId, entries: validation.entries };
 }
 
 function getMimeType (filePath) {
@@ -1129,11 +1204,11 @@ function renderStudioHtml () {
                 <button type="button" class="preset-chip" data-preset-url="https://diegomena.rocks" data-preset-alias="diegomena-rocks">
                   diegomena.rocks
                 </button>
-                <button type="button" class="preset-chip" data-preset-url="https://www.openbank.es/" data-preset-alias="openbank-es">
-                  openbank.es
-                </button>
                 <button type="button" class="preset-chip" data-preset-url="https://www.w3.org/WAI/" data-preset-alias="w3c-wai">
                   w3.org/WAI
+                </button>
+                <button type="button" class="preset-chip" data-preset-url="https://example.com/" data-preset-alias="example-com">
+                  example.com
                 </button>
               </div>
             </div>
@@ -1225,11 +1300,20 @@ diegomena-blog|https://diegomena.rocks/blog/ia-automatizacion-wcag.html</textare
               <label for="input-wait" class="field-label">Espera antes de evaluar (ms)</label>
               <input id="input-wait" type="number" min="0" max="20000" step="500" value="2500" />
             </div>
-            <div class="col-6">
+            <div class="col-4">
+              <label for="select-viewport" class="field-label">Viewport de evaluación</label>
+              <select id="select-viewport">
+                <option value="desktop" selected>Desktop (1440 x 900 px)</option>
+                <option value="tablet">Tablet (768 x 1024 px)</option>
+                <option value="mobile">Mobile (390 x 844 px)</option>
+                <option value="reflow">Reflow WCAG 1.4.10 (320 x 800 px)</option>
+              </select>
+            </div>
+            <div class="col-4">
               <label for="input-root" class="field-label">Selector CSS raíz opcional (<code>--root</code>)</label>
               <input id="input-root" type="text" placeholder="Ej. #main, main" />
             </div>
-            <div class="col-6">
+            <div class="col-4">
               <label for="input-hide" class="field-label">Ocultar selectores CSS (<code>--hide</code>)</label>
               <input id="input-hide" type="text" placeholder="Ej. .cookie-banner, .popup" />
             </div>
@@ -1247,6 +1331,10 @@ diegomena-blog|https://diegomena.rocks/blog/ia-automatizacion-wcag.html</textare
             <label class="checkbox-label">
               <input id="check-standalone" type="checkbox" checked />
               <span>Reporte HTML autocontenido (incrustar capturas en Base64 para descarga en 1 archivo)</span>
+            </label>
+            <label class="checkbox-label">
+              <input id="check-dedupe" type="checkbox" checked />
+              <span>Deduplicar hallazgos equivalentes entre axe y htmlcs</span>
             </label>
           </div>
 
@@ -1833,10 +1921,12 @@ diegomena-blog|https://diegomena.rocks/blog/ia-automatizacion-wcag.html</textare
           project: document.getElementById('input-project').value,
           auditor: document.getElementById('input-auditor').value,
           wait: document.getElementById('input-wait').value,
+          viewport: document.getElementById('select-viewport').value,
           root: document.getElementById('input-root').value,
           hide: document.getElementById('input-hide').value,
           screenshot: document.getElementById('check-screenshot').checked ? 'si' : 'no',
-          standalone: document.getElementById('check-standalone').checked
+          standalone: document.getElementById('check-standalone').checked,
+          dedupe: document.getElementById('check-dedupe').checked
         };
 
         fetch('/api/audit', {
@@ -1984,7 +2074,11 @@ const server = http.createServer((req, res) => {
     const tmpZip = path.join(os.tmpdir(), `pa11y-batch-${safeRunId}.zip`);
     try {
       if (fs.existsSync(tmpZip)) fs.unlinkSync(tmpZip);
-      execFileSync('zip', ['-r', '-q', tmpZip, safeRunId], { cwd: ARTIFACTS_DIR });
+      try {
+        execFileSync('zip', ['-r', '-q', tmpZip, safeRunId], { cwd: ARTIFACTS_DIR });
+      } catch (_zipBinErr) {
+        execFileSync('python3', ['-m', 'zipfile', '-c', tmpZip, safeRunId], { cwd: ARTIFACTS_DIR });
+      }
       res.writeHead(200, {
         'Content-Type': 'application/zip',
         'Content-Disposition': `attachment; filename="pa11y-reporte-${safeRunId}.zip"`
@@ -2049,7 +2143,7 @@ const server = http.createServer((req, res) => {
       res.write(`event: log\ndata: ${JSON.stringify({ line, runId: job.runId })}\n\n`);
     }
 
-    if (job.status !== 'running') {
+    if (job.status !== 'running' && job.status !== 'queued') {
       res.write(`event: done\ndata: ${JSON.stringify({ status: job.status, runId: job.runId, result: job.result })}\n\n`);
       res.end();
       return;
@@ -2082,15 +2176,23 @@ const server = http.createServer((req, res) => {
     return;
   }
 
-  // 6b. API: Cancelar un trabajo en ejecución
+  // 6b. API: Cancelar un trabajo en ejecución o en cola
   const cancelMatch = pathname.match(/^\/api\/audit\/([^/]+)\/cancel$/);
   if (req.method === 'POST' && cancelMatch) {
     const job = jobs.get(cancelMatch[1]);
-    if (job && job.child && job.status === 'running') {
-      try {
-        job.child.kill('SIGTERM');
-      } catch (_e) {}
+    if (job && (job.status === 'running' || job.status === 'queued')) {
       job.status = 'cancelled';
+      if (job.child && job.child.pid) {
+        try {
+          if (process.platform !== 'win32') {
+            process.kill(-job.child.pid, 'SIGTERM');
+          } else {
+            job.child.kill('SIGTERM');
+          }
+        } catch (_e) {
+          try { job.child.kill('SIGTERM'); } catch (_e2) {}
+        }
+      }
     }
     res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
     res.end(JSON.stringify({ ok: true }));
@@ -2116,10 +2218,19 @@ const server = http.createServer((req, res) => {
   res.end('Ruta no encontrada');
 });
 
-server.listen(PORT, () => {
-  console.log('==========================================================');
-  console.log(' Pa11y Batch Web Studio activo en:');
-  console.log(` -> http://localhost:${PORT}/`);
-  console.log(` -> Centro de Reportes: http://localhost:${PORT}/artifacts/index.html`);
-  console.log('==========================================================');
-});
+if (require.main === module) {
+  server.listen(PORT, HOST, () => {
+    console.log('==========================================================');
+    console.log(' Pa11y Batch Web Studio activo en:');
+    console.log(` -> http://${HOST}:${PORT}/`);
+    console.log(` -> Centro de reportes: http://${HOST}:${PORT}/artifacts/index.html`);
+    console.log('==========================================================');
+  });
+}
+
+module.exports = {
+  parseAndValidateUrls,
+  isPrivateOrMetadataHost,
+  slugifyAlias,
+  server
+};

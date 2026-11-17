@@ -4,6 +4,28 @@ Historial de cambios del proyecto **Pa11y Batch**, script de automatización par
 
 ---
 
+## Versión 0.5.0
+
+> Fecha: 17-11-2026  
+> Autor: Diego Javier Mena
+
+### Motor unificado de una sola pasada, cobertura WCAG 2.2 real, multi-viewport y seguridad SSRF
+
+- **Runner unificado de una sola pasada (`scripts/run_url_audit.js`)**:
+  - Ejecuta la evaluación de `pa11y` (`axe-core` + `HTML_CodeSniffer`), la captura `fullPage` y todos los recortes contextuales (`cropDataUrl` + `visualMeta`) sobre **la misma instancia y pestaña de Puppeteer** en una única carga de red, eliminando la doble apertura de Chromium por URL y garantizando consistencia 100 % entre el DOM auditado y la evidencia visual.
+  - Nuevo parámetro `--viewport <desktop|tablet|mobile|reflow|WxH>` (`PA11Y_VIEWPORT`) compartido entre la auditoría y las capturas.
+- **Activación real de reglas WCAG 2.2 y deduplicación cruzada (`--dedupe`)**:
+  - Ejecuta explícitamente los tags `wcag22a` / `wcag22aa` y la regla `target-size` (WCAG 2.5.8) en `axe-core` (omitidos por defecto en `pa11y@8.0.0`), además de verificaciones DOM complementarias para áreas interactivas `< 24x24 px` y desbordamiento horizontal en viewports `<= 400 px` (WCAG 1.4.10 Reflow).
+  - Deduplicación inteligente por defecto (`--dedupe` / `--no-dedupe`): fusiona hallazgos equivalentes cuando `axe` y `htmlcs` coinciden sobre el mismo selector y criterio WCAG (`axe+htmlcs`), evitando inflar los conteos ejecutivos y el umbral `--threshold` de CI/CD.
+- **Auditoría de sitios autenticados, descubrimiento por `--sitemap` y regresión Delta detallada**:
+  - Nuevas banderas `--headers-file`, `--cookies-file` y `--actions-file` para evaluar flujos autenticados o cerrar modales previos, y `--sitemap <url>` (`scripts/fetch_sitemap.js`) para extraer lotes desde `sitemap.xml`.
+  - Desglose de regresión **Delta (`nuevos`, `resueltos`, `persistentes`)** frente al lote inmediato anterior en el Centro de Reportes.
+- **Endurecimiento de seguridad y resiliencia en `Pa11y Batch Web Studio` (`scripts/web_server.js`)**:
+  - Escucha por defecto en `127.0.0.1` (`--host`), protección anti-SSRF frente a hosts privados/loopback/metadatos cloud (`169.254.169.254`, `127.0.0.0/8`, RFC1918; configurable con `--allow-local-targets`), cola de trabajos con límite de concurrencia, terminación limpia del grupo de procesos (`-pid`) al cancelar y generación de paquetes `.zip` con respaldo portable en Python `zipfile`.
+- **Suite de autodiagnóstico sin red (`--self-test` / `npm test`, `scripts/self_test.js`)**.
+
+------------
+
 ## Versión 0.4.0
 
 > Fecha: 22-10-2026  
@@ -66,7 +88,7 @@ Historial de cambios del proyecto **Pa11y Batch**, script de automatización par
     - `findings-consolidated.csv` y `<alias>-findings.csv` con **23 columnas** (`ID_Hallazgo`, `Principio_WCAG`, `Pauta_WCAG`, `Criterio_WCAG`, `Nombre_Criterio_WCAG`, `Nivel_WCAG`, `Nivel_Impacto`, `Elemento_HTML`, `Descripcion_Hallazgo_ES`, `Recomendacion_Tecnica`, `URL_Documentacion`, `Selector_CSS`, `Fragmento_HTML`, etc.).
     - `wcag-matrix.csv` con **14 columnas** agrupadas por criterio WCAG.
     - `summary.csv` enriquecido a **25 columnas** incluyendo conteos por nivel de impacto, por los 4 Principios WCAG y el Top 3 de criterios más afectados por URL.
-- **Rediseño Frontend Ejecutivo y Responsivo (Desktop, Tablet y Mobile — WCAG 1.4.10 Reflow)**:
+- **Rediseño frontend ejecutivo y responsivo (Desktop, Tablet y Mobile - WCAG 1.4.10 Reflow)**:
   - Nuevo sistema visual unificado con **Tema Claro / Oscuro** persistente, visor de fragmentos HTML con resaltado de sintaxis y numeración de líneas sin scroll horizontal, selectores CSS tokenizados, visor modal (`<dialog>`) de evidencia visual en las 3 vistas y tablas adaptativas que se convierten en tarjetas en dispositivos móviles y tablets.
 
 ------------
@@ -153,7 +175,7 @@ Historial de cambios del proyecto **Pa11y Batch**, script de automatización par
 
 ------------
 
-## Versión 0.0.0 – Bitácora inicial de pruebas manuales
+## Versión 0.0.0 - Bitácora inicial de pruebas manuales
 
 > Fecha: 16-02-2025  
 > Autor: Diego Javier Mena

@@ -16,7 +16,10 @@ Uso:
   1) Con banderas (recomendado para CI/CD y reportes para Stakeholders):
      $0 --urls <archivo_urls> [--format html|json|csv|tsv|cli] [--level errors|warnings|notices]
         [--wait 3000] [--standard WCAG2A|WCAG2AA|WCAG2AAA] [--runners ambos|axe|htmlcs]
+        [--viewport desktop|tablet|mobile|reflow|WxH] [--dedupe|--no-dedupe]
         [--lang es|en] [--root "#main"] [--hide ".banner,.ads"] [--screenshot si|no]
+        [--headers-file headers.json] [--cookies-file cookies.json] [--actions-file actions.txt]
+        [--sitemap https://ejemplo.com/sitemap.xml] [--max-urls 25]
         [--project "Portal Corporativo"] [--auditor "Diego Mena"] [--standalone]
         [--threshold 0] [--ci]
 
@@ -26,8 +29,11 @@ Uso:
   3) Modo interactivo (sin argumentos):
      $0
 
-  4) Modo Servidor Web Interactivo (Pa11y Batch Web Studio):
-     $0 --web [--port 8098]
+  4) Modo servidor web interactivo (Pa11y Batch Web Studio):
+     $0 --web [--port 8098] [--host 127.0.0.1] [--allow-local-targets]
+
+  5) Autodiagnóstico interno sin red:
+     $0 --self-test
 
 Variables de entorno soportadas (para CI/CD):
   PA11Y_FORMAT, PA11Y_LEVEL, PA11Y_WAIT, PA11Y_URLS, PA11Y_ROOT, PA11Y_HIDE,
@@ -58,8 +64,18 @@ THRESHOLD="${PA11Y_THRESHOLD:-0}"
 PROJECT_NAME="${PA11Y_PROJECT:-}"
 AUDITOR_NAME="${PA11Y_AUDITOR:-}"
 STANDALONE_MODE="${PA11Y_STANDALONE:-false}"
+VIEWPORT="${PA11Y_VIEWPORT:-desktop}"
+DEDUPE_MODE="${PA11Y_DEDUPE:-true}"
+HEADERS_FILE="${PA11Y_HEADERS_FILE:-}"
+COOKIES_FILE="${PA11Y_COOKIES_FILE:-}"
+ACTIONS_FILE="${PA11Y_ACTIONS_FILE:-}"
+SITEMAP_URL="${PA11Y_SITEMAP:-}"
+MAX_SITEMAP_URLS="${PA11Y_MAX_URLS:-25}"
+SELF_TEST_MODE=false
 WEB_MODE=false
 WEB_PORT="${PORT:-8098}"
+WEB_HOST="${HOST:-127.0.0.1}"
+ALLOW_LOCAL_TARGETS="${PA11Y_ALLOW_LOCAL:-false}"
 FLAG_MODE=false
 
 REPORTER="${PA11Y_FORMAT:-}"
@@ -150,6 +166,50 @@ while [[ $# -gt 0 ]]; do
       FLAG_MODE=true
       shift
       ;;
+    --viewport|-V)
+      VIEWPORT="$2"
+      FLAG_MODE=true
+      shift 2
+      ;;
+    --dedupe)
+      DEDUPE_MODE=true
+      FLAG_MODE=true
+      shift
+      ;;
+    --no-dedupe)
+      DEDUPE_MODE=false
+      FLAG_MODE=true
+      shift
+      ;;
+    --headers-file)
+      HEADERS_FILE="$2"
+      FLAG_MODE=true
+      shift 2
+      ;;
+    --cookies-file)
+      COOKIES_FILE="$2"
+      FLAG_MODE=true
+      shift 2
+      ;;
+    --actions-file)
+      ACTIONS_FILE="$2"
+      FLAG_MODE=true
+      shift 2
+      ;;
+    --sitemap)
+      SITEMAP_URL="$2"
+      FLAG_MODE=true
+      shift 2
+      ;;
+    --max-urls)
+      MAX_SITEMAP_URLS="$2"
+      FLAG_MODE=true
+      shift 2
+      ;;
+    --self-test)
+      SELF_TEST_MODE=true
+      shift
+      ;;
     --web|--serve)
       WEB_MODE=true
       shift
@@ -157,6 +217,14 @@ while [[ $# -gt 0 ]]; do
     --port)
       WEB_PORT="$2"
       shift 2
+      ;;
+    --host)
+      WEB_HOST="$2"
+      shift 2
+      ;;
+    --allow-local-targets)
+      ALLOW_LOCAL_TARGETS=true
+      shift
       ;;
     *)
       POSITIONAL_ARGS+=("$1")
@@ -166,8 +234,16 @@ while [[ $# -gt 0 ]]; do
 done
 set -- "${POSITIONAL_ARGS[@]}"
 
+if [ "$SELF_TEST_MODE" = true ]; then
+  exec node "$SCRIPT_DIR/scripts/self_test.js"
+fi
+
 if [ "$WEB_MODE" = true ]; then
-  exec node "$SCRIPT_DIR/scripts/web_server.js" --port "$WEB_PORT"
+  WEB_EXTRA_ARGS=()
+  if [ "$ALLOW_LOCAL_TARGETS" = true ]; then
+    WEB_EXTRA_ARGS+=(--allow-local-targets)
+  fi
+  exec node "$SCRIPT_DIR/scripts/web_server.js" --port "$WEB_PORT" --host "$WEB_HOST" "${WEB_EXTRA_ARGS[@]}"
 fi
 
 # ----------------------------------------
@@ -323,6 +399,17 @@ if ! [[ "$THRESHOLD" =~ ^[0-9]+$ ]]; then
   exit 1
 fi
 
+SITEMAP_TMP=""
+if [ -n "$SITEMAP_URL" ] && [ -z "$URL_FILE" ]; then
+  SITEMAP_TMP="/tmp/pa11y-sitemap-$$-${RANDOM}.txt"
+  echo "Extrayendo URLs desde sitemap: $SITEMAP_URL (máx. $MAX_SITEMAP_URLS)..."
+  if ! node "$SCRIPT_DIR/scripts/fetch_sitemap.js" "$SITEMAP_URL" "$SITEMAP_TMP" "$MAX_SITEMAP_URLS"; then
+    rm -f "$SITEMAP_TMP"
+    exit 1
+  fi
+  URL_FILE="$SITEMAP_TMP"
+fi
+
 if [ ! -f "$URL_FILE" ]; then
   echo "El archivo '$URL_FILE' no existe o no es válido."
   exit 1
@@ -348,7 +435,7 @@ cat <<EOF > "$PA11Y_CONFIG_TMP"
   }
 }
 EOF
-trap 'rm -f "$PA11Y_CONFIG_TMP"' EXIT
+trap 'rm -f "$PA11Y_CONFIG_TMP" "$SITEMAP_TMP"' EXIT
 
 # ----------------------------------------
 # Configurar opciones base de Pa11y
@@ -388,10 +475,14 @@ fi
 # ----------------------------------------
 ARTIFACTS_ROOT="./artifacts"
 RUN_ID=$(date "+%Y-%m-%d_%H-%M-%S")
+if [ -d "${ARTIFACTS_ROOT}/${RUN_ID}" ]; then
+  RUN_ID="${RUN_ID}-$$"
+fi
 FECHA_HUMANA=$(date "+%Y-%m-%d %H:%M:%S")
 RUN_DIR="${ARTIFACTS_ROOT}/${RUN_ID}"
 LATEST_DIR="${ARTIFACTS_ROOT}/latest"
 mkdir -p "$RUN_DIR"
+DEBUG_LOG="${RUN_DIR}/debug.log"
 
 SUMMARY_CSV="${RUN_DIR}/summary.csv"
 INDEX_HTML="${RUN_DIR}/index.html"
@@ -465,21 +556,51 @@ while IFS='|' read -r alias url || [ -n "$alias" ]; do
   fi
 
   echo "[ETAPA 1/4] Analizando (${TOTAL_URLS}): $alias -> $url"
-  echo "[ETAPA 2/4] Ejecutando motores WCAG ($RUNNERS_LABEL) con espera de ${WAIT}ms..."
+  echo "[ETAPA 2/4] Ejecutando motores WCAG 2.2 ($RUNNERS_LABEL · viewport $VIEWPORT) con espera de ${WAIT}ms..."
   echo "Guardando en: $output_file"
 
-  pa11y "$url" "${RUN_ARGS[@]}" > "$raw_json_tmp" 2> "$pa11y_err_tmp"
-  exit_code=$?
+  if [ "$TAKE_SCREENSHOT" = true ] || [ "$REPORTER" = "html" ]; then
+    capture_filename="${alias}-capture.png"
+  fi
 
-  # Si se solicitó captura (o reporte HTML), extraer recortes visuales y coordenadas DOM con Puppeteer
-  if { [ "$exit_code" -eq 0 ] || [ "$exit_code" -eq 2 ]; } && [ -s "$raw_json_tmp" ]; then
-    if [ "$TAKE_SCREENSHOT" = true ] || [ "$REPORTER" = "html" ]; then
-      if [ -z "$capture_filename" ]; then
-        capture_filename="${alias}-capture.png"
-      fi
-      echo "[ETAPA 3/4] Capturando evidencia visual del DOM y recortes de hallazgos para $alias..."
-      node "$SCRIPT_DIR/scripts/capture_visual_coords.js" "$url" "$raw_json_tmp" "${RUN_DIR}/${capture_filename}" "$WAIT" 2>/dev/null || true
-    fi
+  UNIFIED_ARGS=(
+    --url "$url"
+    --out-json "$raw_json_tmp"
+    --standard "$STANDARD"
+    --runners "$RUNNERS_CHOICE"
+    --level "$LEVEL"
+    --wait "$WAIT"
+    --viewport "$VIEWPORT"
+  )
+  if [ -n "$capture_filename" ]; then
+    echo "[ETAPA 3/4] Capturando evidencia visual del DOM y recortes en una sola pasada para $alias..."
+    UNIFIED_ARGS+=(--capture-png "${RUN_DIR}/${capture_filename}")
+  fi
+  if [ -n "$ROOT_SELECTOR" ]; then
+    UNIFIED_ARGS+=(--root "$ROOT_SELECTOR")
+  fi
+  if [ -n "$HIDE_SELECTORS" ]; then
+    UNIFIED_ARGS+=(--hide "$HIDE_SELECTORS")
+  fi
+  if [ -n "$HEADERS_FILE" ]; then
+    UNIFIED_ARGS+=(--headers-file "$HEADERS_FILE")
+  fi
+  if [ -n "$COOKIES_FILE" ]; then
+    UNIFIED_ARGS+=(--cookies-file "$COOKIES_FILE")
+  fi
+  if [ -n "$ACTIONS_FILE" ]; then
+    UNIFIED_ARGS+=(--actions-file "$ACTIONS_FILE")
+  fi
+  if [ "$DEDUPE_MODE" = false ] || [ "$DEDUPE_MODE" = "0" ]; then
+    UNIFIED_ARGS+=(--no-dedupe)
+  else
+    UNIFIED_ARGS+=(--dedupe)
+  fi
+
+  node "$SCRIPT_DIR/scripts/run_url_audit.js" "${UNIFIED_ARGS[@]}" 2> "$pa11y_err_tmp"
+  exit_code=$?
+  if [ -s "$pa11y_err_tmp" ]; then
+    cat "$pa11y_err_tmp" >> "$DEBUG_LOG"
   fi
 
   estado_label=""
@@ -500,7 +621,7 @@ while IFS='|' read -r alias url || [ -n "$alias" ]; do
 
   if { [ "$exit_code" -eq 0 ] || [ "$exit_code" -eq 2 ]; } && [ -s "$raw_json_tmp" ]; then
     echo "[ETAPA 4/4] Traduciendo hallazgos y compilando reporte interactivo para $alias..."
-    stats_line=$(node "$SCRIPT_DIR/scripts/format_report.js" "$raw_json_tmp" "$output_file" "$REPORTER" "$REPORT_LANG" "$alias" "$url" "$STANDARD" "$RUNNERS_LABEL" "$capture_filename" "$CI_JSONL" "$RUN_ID" "$PROJECT_NAME" "$AUDITOR_NAME" "$STANDALONE_MODE" 2>/dev/null)
+    stats_line=$(node "$SCRIPT_DIR/scripts/format_report.js" "$raw_json_tmp" "$output_file" "$REPORTER" "$REPORT_LANG" "$alias" "$url" "$STANDARD" "$RUNNERS_LABEL" "$capture_filename" "$CI_JSONL" "$RUN_ID" "$PROJECT_NAME" "$AUDITOR_NAME" "$STANDALONE_MODE" 2>> "$DEBUG_LOG")
     format_status=$?
 
     if [ "$format_status" -eq 0 ] && [ -s "$output_file" ]; then
@@ -579,7 +700,10 @@ while IFS='|' read -r alias url || [ -n "$alias" ]; do
 done < "$URL_FILE"
 
 # Generar artefactos nativos de CI/CD, Dashboard del lote y Centro de Reportes raíz
-node "$SCRIPT_DIR/scripts/generate_ci_reports.js" "$RUN_DIR" "$RUN_ID" "$FECHA_HUMANA" "$STANDARD" "$RUNNERS_LABEL" "$LEVEL" "$REPORTER" "$THRESHOLD" "$ARTIFACTS_ROOT" "$PROJECT_NAME" "$AUDITOR_NAME" 2>/dev/null || true
+node "$SCRIPT_DIR/scripts/generate_ci_reports.js" "$RUN_DIR" "$RUN_ID" "$FECHA_HUMANA" "$STANDARD" "$RUNNERS_LABEL" "$LEVEL" "$REPORTER" "$THRESHOLD" "$ARTIFACTS_ROOT" "$PROJECT_NAME" "$AUDITOR_NAME" 2>> "$DEBUG_LOG" || true
+if [ ! -s "$DEBUG_LOG" ]; then
+  rm -f "$DEBUG_LOG"
+fi
 
 # Sincronizar carpeta fija ./artifacts/latest/ para pipelines de CI/CD
 rm -rf "$LATEST_DIR"

@@ -100,7 +100,7 @@ records.forEach(r => {
 });
 
 // ---------------------------------------------------------
-// 1. Generar CSV Maestro de Hallazgos Consolidados (findings-consolidated.csv) — 23 columnas
+// 1. Generar CSV Maestro de Hallazgos Consolidados (findings-consolidated.csv) - 23 columnas
 // ---------------------------------------------------------
 const consolidatedHeaders = [
 	'ID_Hallazgo',
@@ -199,8 +199,8 @@ records.forEach(rec => {
 		if (iss.type === 'error') entry.errors += 1;
 		else if (iss.type === 'warning') entry.warnings += 1;
 		else entry.notices += 1;
-		if (iss.runner === 'axe') entry.axe += 1;
-		if (iss.runner === 'htmlcs') entry.htmlcs += 1;
+		if (String(iss.runner || '').includes('axe')) entry.axe += 1;
+		if (String(iss.runner || '').includes('htmlcs')) entry.htmlcs += 1;
 		if (iss.code) entry.rules.add(iss.code);
 		if (rec.alias) entry.sites.add(rec.alias);
 	});
@@ -253,7 +253,7 @@ fs.writeFileSync(
 );
 
 // ---------------------------------------------------------
-// 3. Generar Resumen Ejecutivo por URL Enriquecido (summary.csv) — 25 columnas
+// 3. Generar Resumen Ejecutivo por URL Enriquecido (summary.csv) - 25 columnas
 // ---------------------------------------------------------
 const summaryHeaders = [
 	'Lote_ID',
@@ -503,15 +503,48 @@ const historyLines = fs.readFileSync(historyCsvPath, 'utf8')
 let deltaBadgeHtml = '<span class="kpi-sub">Primera ejecución registrada</span>';
 if (historyLines.length >= 2) {
 	const prevCols = historyLines[1].split(',').map(c => c.replace(/^"|"$/g, ''));
+	const prevRunId = prevCols[0] || '';
 	const prevErr = parseInt(prevCols[7], 10);
+	let detailSuffix = '';
+	const prevJsonlPath = prevRunId ? path.join(artifactsRoot, prevRunId, '.ci-items.jsonl') : '';
+	if (prevJsonlPath && fs.existsSync(prevJsonlPath)) {
+		try {
+			const prevRecs = fs.readFileSync(prevJsonlPath, 'utf8')
+				.split('\n')
+				.map(l => l.trim())
+				.filter(Boolean)
+				.map(l => JSON.parse(l));
+			const buildSet = (recs) => {
+				const s = new Set();
+				recs.forEach(r => {
+					(r.issues || []).forEach(i => {
+						if (i.type === 'error') {
+							s.add(`${r.alias}::${i.code}::${i.selector || ''}`);
+						}
+					});
+				});
+				return s;
+			};
+			const curSet = buildSet(records);
+			const prvSet = buildSet(prevRecs);
+			let newCnt = 0;
+			let fixedCnt = 0;
+			let persistCnt = 0;
+			curSet.forEach(k => { if (prvSet.has(k)) persistCnt++; else newCnt++; });
+			prvSet.forEach(k => { if (!curSet.has(k)) fixedCnt++; });
+			detailSuffix = ` (${newCnt} nuevos · ${fixedCnt} resueltos · ${persistCnt} persistentes)`;
+		} catch {
+			detailSuffix = '';
+		}
+	}
 	if (!Number.isNaN(prevErr)) {
 		const diff = totalErrors - prevErr;
 		if (diff < 0) {
-			deltaBadgeHtml = `<span class="kpi-sub" style="color:var(--ok);font-weight:700;">${diff} errores vs. lote anterior (Mejora)</span>`;
+			deltaBadgeHtml = `<span class="kpi-sub" style="color:var(--ok);font-weight:700;">${diff} errores vs. lote anterior${escapeHtml(detailSuffix)}</span>`;
 		} else if (diff > 0) {
-			deltaBadgeHtml = `<span class="kpi-sub" style="color:var(--err);font-weight:700;">+${diff} errores vs. lote anterior</span>`;
+			deltaBadgeHtml = `<span class="kpi-sub" style="color:var(--err);font-weight:700;">+${diff} errores vs. lote anterior${escapeHtml(detailSuffix)}</span>`;
 		} else {
-			deltaBadgeHtml = `<span class="kpi-sub">Sin variación vs. lote anterior (${prevErr})</span>`;
+			deltaBadgeHtml = `<span class="kpi-sub">Sin variación neta (${prevErr})${escapeHtml(detailSuffix)}</span>`;
 		}
 	}
 }
@@ -1384,7 +1417,3 @@ const rootPortalHtml = `<!DOCTYPE html>
 </html>`;
 
 fs.writeFileSync(path.join(artifactsRoot, 'index.html'), rootPortalHtml + '\n', 'utf8');
-
-if (fs.existsSync(jsonlPath)) {
-	fs.unlinkSync(jsonlPath);
-}

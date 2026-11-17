@@ -32,6 +32,8 @@ Puedes ejecutarlo mediante **banderas con nombre** (recomendado para pipelines C
   --wait 3000 \
   --standard WCAG2AA \
   --runners ambos \
+  --viewport desktop \
+  --dedupe \
   --lang es \
   --screenshot si \
   --project "Portal Corporativo" \
@@ -43,20 +45,27 @@ Puedes ejecutarlo mediante **banderas con nombre** (recomendado para pipelines C
 | Bandera | Variable de Entorno | Descripción |
 | :--- | :--- | :--- |
 | `--urls, -u` | `PA11Y_URLS` | Ruta al archivo `.txt` con formato `alias\|url`. |
+| `--sitemap` | `PA11Y_SITEMAP` | URL a un `sitemap.xml` para descubrir y auditar páginas automáticamente (con `--max-urls N`). |
 | `--format, -r` | `PA11Y_FORMAT` | Tipo de reporte: `html` *(default)*, `json`, `csv`, `tsv`, `cli`. |
 | `--level, -l` | `PA11Y_LEVEL` | Severidad incluida: `errors`, `warnings` *(default)*, `notices`. |
 | `--wait, -w` | `PA11Y_WAIT` | Espera en milisegundos antes de evaluar (`3000` por defecto). |
 | `--standard, -s` | `PA11Y_STANDARD` | Estándar: `WCAG2A`, `WCAG2AA` *(default)*, `WCAG2AAA`. |
 | `--runners, -e` | `PA11Y_RUNNERS` | Motores: `ambos` *(default: `axe` + `htmlcs`)*, `axe`, `htmlcs`. |
+| `--viewport, -V` | `PA11Y_VIEWPORT` | Viewport unificado: `desktop` (`1440x900`), `tablet` (`768x1024`), `mobile` (`390x844`), `reflow` (`320x800`) o `WxH`. |
+| `--dedupe` / `--no-dedupe` | `PA11Y_DEDUPE` | Fusiona hallazgos equivalentes cuando `axe` y `htmlcs` coinciden en selector y criterio WCAG (`true` por defecto). |
 | `--lang` | `PA11Y_LANG` | Idioma de traducción: `es` *(default)*, `en`. |
 | `--root, -R` | `PA11Y_ROOT` | Selector CSS raíz opcional (ej. `#main`). |
 | `--hide, -E` | `PA11Y_HIDE` | Selectores CSS a ocultar separados por coma (ej. `.cookie-banner,.ads`). |
+| `--headers-file` | `PA11Y_HEADERS_FILE` | Archivo JSON con cabeceras HTTP personalizadas (ej. tokens `Authorization`). |
+| `--cookies-file` | `PA11Y_COOKIES_FILE` | Archivo JSON con cookies de sesión para auditar vistas autenticadas. |
+| `--actions-file` | `PA11Y_ACTIONS_FILE` | Archivo con acciones pre-auditoría de Pa11y (ej. cerrar banner de cookies o login). |
 | `--screenshot, -S` | `PA11Y_SCREENSHOT` | Guardar captura `.png` y recortes visuales de evidencia (`si` / `no`). |
 | `--project, -p` | `PA11Y_PROJECT` | Nombre del proyecto/cliente para el membrete ejecutivo y etiquetas Open Graph. |
 | `--auditor, -a` | `PA11Y_AUDITOR` | Nombre del consultor/equipo auditor en el encabezado de los reportes. |
 | `--standalone` | `PA11Y_STANDALONE` | Incrusta la captura de pantalla en Base64 dentro del `.html` para compartirlo como archivo único. |
 | `--threshold, -T` | `PA11Y_THRESHOLD` | Máximo de errores permitidos en modo `--ci` antes de fallar (`0` por defecto). |
 | `--ci` | `PA11Y_CI` | Activa modo CI/CD: devuelve código `1` en error técnico o `2` si `errores > threshold`. |
+| `--self-test` | - | Ejecuta la suite de autodiagnóstico interno sin red (`npm test`). |
 
 ### Opción 2: con argumentos posicionales
 
@@ -105,9 +114,9 @@ artifacts/
 │   ├── summary.md                       # Resumen en Markdown ($GITHUB_STEP_SUMMARY / Azure DevOps)
 │   ├── junit.xml                        # Reporte JUnit XML (Azure DevOps / GitLab / GitHub)
 │   ├── gl-code-quality-report.json      # Reporte GitLab Code Quality para Merge Requests
-│   ├── openbank-es-report.html          # Reporte individual interactivo por alias
-│   ├── openbank-es-findings.csv         # CSV detallado de hallazgos de este sitio (23 columnas)
-│   └── openbank-es-capture.png          # Captura de pantalla de evidencia (si se activó)
+│   ├── w3c-wai-report.html              # Reporte individual interactivo por alias
+│   ├── w3c-wai-findings.csv             # CSV detallado de hallazgos de este sitio (23 columnas)
+│   └── w3c-wai-capture.png              # Captura de pantalla de evidencia (si se activó)
 └── 2026-10-16_07-49-25/                 # Carpeta histórica del lote con fecha y hora legible
 ``` 
 
@@ -141,7 +150,7 @@ El repositorio incluye plantillas listas para producción en la carpeta [`ci/`](
 - Ejecuta con un tiempo de espera configurable para garantizar que la página cargue completamente antes de la evaluación.
 - Genera reportes individuales en formatos compatibles: `html`, `json`, `csv`, `tsv` o salida por consola (`cli`).
 - **Traducción automática de reportes al español (`es` por defecto, o `en`)**: incluye diccionarios completos en [`locales/es.json`](locales/es.json) y [`locales/htmlcs_es.json`](locales/htmlcs_es.json) con las **105 reglas y 100 checks de `axe-core`** (más su mapeo `axeToWcag`), las **244 entradas oficiales de `HTML_CodeSniffer` (`htmlcs`)** y los **87 criterios WCAG 2.2**.
-- **Interfaz Web Ejecutiva y 100 % Responsiva (Desktop, Tablet y Mobile — WCAG 1.4.10 Reflow)**:
+- **Interfaz web ejecutiva y 100 % responsiva (Desktop, Tablet y Mobile - WCAG 1.4.10 Reflow)**:
   - Conmutador de **Tema Claro / Oscuro** persistente, visor de código HTML con resaltado de sintaxis y ajuste de línea sin scroll horizontal, ruta de selectores CSS en tokens visuales, visor modal (`<dialog>`) de capturas de evidencia en todas las vistas, y tablas adaptativas que se transforman en tarjetas en pantallas móviles.
 - **Generación automática de artefactos CSV enriquecidos (23 y 25 columnas con BOM UTF-8)** y reportes nativos de CI/CD (`junit.xml`, `gl-code-quality-report.json`, `summary.md`).
 - Soporte opcional de captura de pantalla (`--screen-capture`) por cada URL evaluada como evidencia visual.
